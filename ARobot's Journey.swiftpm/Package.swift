@@ -8,20 +8,20 @@ import PackageDescription
 import AppleProductTypes
 
 let package = Package(
-    name: "ARobot's Journey",
+    name: "Pirate ARdventures Code Quest",
     platforms: [
         .iOS("15.2")
     ],
     products: [
         .iOSApplication(
-            name: "ARobot's Journey",
+            name: "Pirate ARdventures Code Quest",
             targets: ["AppModule"],
             bundleIdentifier: "dev.yrk06.ARobot-s-Journey",
             teamIdentifier: "SA5RM672D2",
             displayVersion: "1.0",
             bundleVersion: "1",
-            appIcon: .placeholder(icon: .clock),
-            accentColor: .presetColor(.teal),
+            appIcon: .asset("AppIcon"),
+            accentColor: .presetColor(.cyan),
             supportedDeviceFamilies: [
                 .pad,
                 .phone
@@ -34,7 +34,8 @@ let package = Package(
             ],
             capabilities: [
                 .camera(purposeString: "The camera used to display the game board")
-            ]
+            ],
+            appCategory: .games
         )
     ],
     targets: [

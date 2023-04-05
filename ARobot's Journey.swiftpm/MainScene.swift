@@ -37,7 +37,14 @@ class ARController: UIViewController, ARSCNViewDelegate {
         // Place content only for anchors found by plane detection.
         guard let planeAnchor = anchor as? ARPlaneAnchor else { return }
         
-        let sphere = SCNNode(geometry: SCNSphere(radius: 0.05))
+        
+        let url = Bundle.main.url(forResource: "BoardStart", withExtension: "scn" )!
+        let sphere = SCNReferenceNode(url: url)!
+        SCNTransaction.begin()
+        sphere.load()
+        SCNTransaction.commit()
+        
+        //let sphere = SCNNode(geometry: SCNSphere(radius: 0.05))
         sphere.simdPosition = SIMD3<Float>(planeAnchor.center.x,0.05,planeAnchor.center.z)
         node.addChildNode(sphere)
         possibleBoardLocations.append(BoardPossibleLocation(node: node, gizmo: sphere, anchor: planeAnchor))
@@ -53,7 +60,8 @@ class ARController: UIViewController, ARSCNViewDelegate {
         }
         let resultNode = result.node
         //result.node.geometry?.firstMaterial?.diffuse.contents = UIColor.red
-        let anchorInfo = possibleBoardLocations.first(where: {$0.gizmo == resultNode})
+        let anchorInfo = possibleBoardLocations.first(where: {$0.gizmo == resultNode.parent?.parent})
+        
         
         possibleBoardLocations.forEach({$0.gizmo.removeFromParentNode()})
         possibleBoardLocations.removeAll(where: {_ in true})
