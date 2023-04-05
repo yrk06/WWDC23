@@ -19,17 +19,17 @@ func board2scene(from: SIMD2<Int>) -> SIMD3<Float> {
 
 extension RandomAccessCollection {
 
-    func binarySearch(predicate: (Iterator.Element) -> Bool) -> Index {
+    func binarySearch(predicate: (Iterator.Element) -> Bool) -> Bool {
         var low = startIndex
         var high = endIndex
         while low != high {
             let mid = index(low, offsetBy: distance(from: low, to: high)/2)
             if predicate(self[mid]) {
-                low = index(after: mid)
+                return true
             } else {
                 high = mid
             }
         }
-        return low
+        return false
     }
 }
