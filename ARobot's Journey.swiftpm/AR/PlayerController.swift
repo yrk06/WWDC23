@@ -56,7 +56,15 @@ class PlayerController : SCNNode {
                             Int(round(worldForward.z)) + self.boardPosition.y)
     }
     
-    func updatePosition(tiles: Int) async {
+    func getPlayerForwardVector() -> SCNVector3 {
+        return self.convertVector(SCNVector3(0, 0, -1), to: self.parent)
+    }
+    
+    func getPlayerRightVector() -> SCNVector3 {
+        return self.convertVector(SCNVector3(1, 0, 0), to: self.parent)
+    }
+    
+    func updatePosition(tiles: Int, isFirst : Bool = false, isLast : Bool = false) async {
         
         let to = getForwardPosition(tiles: tiles)
         
@@ -67,7 +75,13 @@ class PlayerController : SCNNode {
         let moveDistance = distance(SIMD3<Float>(self.position.x,self.position.y, self.position.z), scenePos) / 0.2 * 20 // Normalize distance
         let movement = SCNAction.move(to: SCNVector3(scenePos.x, self.position.y, scenePos.z), duration: Double(moveDistance))
         
-        movement.timingMode = .easeInEaseOut
+        movement.timingMode = .linear
+        if isFirst {
+            movement.timingMode = .easeIn
+        }
+        if isLast {
+            movement.timingMode = .easeOut
+        }
         await self.runAction(movement)
     }
     

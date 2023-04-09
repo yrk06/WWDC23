@@ -11,10 +11,12 @@ class GameboardNode : SCNNode {
     var level : GameLevel? = nil
     var playerController : PlayerController? = nil
     var gameover = false
+    var hud : BoardHud!
     
-    static func newGameboard() -> SCNNode {
+    static func newGameboard(hud: BoardHud) -> SCNNode {
         
         let node = GameboardNode()
+        node.hud = hud
         let url = Bundle.main.url(forResource: "Gameboard", withExtension: "scn" )!
         let referenceNode = SCNReferenceNode(url: url)!
         node.addChildNode(referenceNode)
@@ -55,19 +57,24 @@ class GameboardNode : SCNNode {
         node.loadLevel(level: GameLevel(elements: [
             BoardElement(boardPosition: SIMD2<Int>(6,1), boardSize: SIMD2<Int>(2,2), meshName: "tower"),
             BoardElement(boardPosition: SIMD2<Int>(6,6), boardSize: SIMD2<Int>(2,2), meshName: "tower"),
-            BoardElement(boardPosition: SIMD2<Int>(0,6), boardSize: SIMD2<Int>(2,2), meshName: "tower"),
+            BoardElement(boardPosition: SIMD2<Int>(1,6), boardSize: SIMD2<Int>(2,2), meshName: "tower"),
             BoardElement(boardPosition: SIMD2<Int>(1,1), boardSize: SIMD2<Int>(2,2), meshName: "tower"),
-        ]))
+        ],objective: BoardElement(boardPosition: SIMD2<Int>(8,8), boardSize: SIMD2<Int>(1,1), meshName: "chest")))
         
         node.playerController = PlayerController(at: SIMD2<Int>(0,0))
         
         node.addChildNode(node.playerController!)
         
         
-        DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
+        
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+            hud.createListOfActions(list: node.playerActionQueue)
             
-            Task {
-                await node.runActionQueue()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 3){
+                Task {
+                    await node.runActionQueue()
+                }
             }
             
         }
@@ -79,7 +86,9 @@ class GameboardNode : SCNNode {
     
     var playerActionIndex = 0
     var playerActionQueue = [
-        PlayerAction(distance: 8, rotate: 0),
+        
+        PlayerAction(distance: 1, rotate: 0),
+        PlayerAction(distance: 7, rotate: 0),
         PlayerAction(distance: 0, rotate: -1),
         
         PlayerAction(distance: 8, rotate: 0),
@@ -91,13 +100,13 @@ class GameboardNode : SCNNode {
         PlayerAction(distance: 8, rotate: 0),
         PlayerAction(distance: 0, rotate: -1),
         
-//        PlayerAction(distance: 2, rotate: 0),
-//        PlayerAction(distance: 0, rotate: 1),
-//        PlayerAction(distance: 2, rotate: 0),
-//        PlayerAction(distance: 0, rotate: -1),
-//
-//        PlayerAction(distance: 6, rotate: 0),
-//        PlayerAction(distance: 0, rotate: -1),
+        PlayerAction(distance: 2, rotate: 0),
+        PlayerAction(distance: 0, rotate: 1),
+        PlayerAction(distance: 2, rotate: 0),
+        PlayerAction(distance: 0, rotate: -1),
+
+        PlayerAction(distance: 6, rotate: 0),
+        PlayerAction(distance: 0, rotate: -1),
     
     ]
     func runNextPlayerAction() async {
@@ -105,38 +114,53 @@ class GameboardNode : SCNNode {
         
         await playerController!.updateRotation(rotation: action.rotate)
         
-        for _ in 0..<action.distance {
+        for p in 0..<action.distance {
             let nextPos = playerController!.getForwardPosition(tiles: 1)
             let nextTileNum = SzudzikMap(a: nextPos.x, b: nextPos.y)
             
-            if level!.collisionTiles.binarySearch(predicate: { tile in
-                tile == nextTileNum
-            })   {
+            if nextPos.x < 0 || nextPos.y < 0 || nextPos.x > 8 || nextPos.y > 8 || level!.collisionTiles.contains(where: {
+                $0 == nextTileNum
+            })    {
                 gameover = true
+                
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                    self.playerController?.removeAllActions()
+                    let player = self.playerController!
+                    player.removeAllActions()
                     
-                    let fall = SCNAction.rotateBy(x: 0, y: 0, z: -4 * .pi / 6, duration: 3)
-                    fall.timingMode = .easeInEaseOut
+                    let playerAxis = player.getPlayerRightVector()
                     
-                    let rise = SCNAction.rotateBy(x: 0, y: 0, z: .pi / 6, duration: 2)
-                    rise.timingMode = .easeInEaseOut
+                    let fall = SCNAction.rotate(by: .pi / 2, around: playerAxis, duration: 3)
+                    let rise = SCNAction.rotate(by: -.pi / 6, around: playerAxis, duration: 2)
                     
-                    let itSink = SCNAction.moveBy(x: 0, y: -0.01, z: 0, duration: 1)
+//                    let fall = SCNAction.rotateBy(x: 0, y: 0, z: -4 * .pi / 6, duration: 3)
+//                    fall.timingMode = .easeInEaseOut
+//
+//                    let rise = SCNAction.rotateBy(x: 0, y: 0, z: .pi / 6, duration: 2)
+//                    rise.timingMode = .easeInEaseOut
                     
-                    self.playerController?.runAction(SCNAction.sequence([
-                        fall,rise,itSink
+                    let itSink = SCNAction.moveBy(x: 0, y: -0.008, z: 0, duration: 3)
+                    
+                    self.playerController?.runAction(SCNAction.sequence([SCNAction.group([
+                    fall,itSink]),rise
                     ]))
                     
+                    self.hud.setActionFailure()
                     self.gameover = true
                     //self.playerController?.removeFromParentNode()
                 }
             }
             
-            await playerController!.updatePosition(tiles: 1)
+            if nextPos == level?.objective.boardPosition {
+                print("I have achieved the objective")
+                gameover = true
+            }
+            
+            await playerController!.updatePosition(tiles: 1,isFirst: p == 0, isLast: p == (action.distance - 1) )
         }
         
-        playerActionIndex = (playerActionIndex + 1) % playerActionQueue.count
+        await hud.consumeAction()
+        playerActionIndex += 1
+        gameover = gameover ? gameover : playerActionIndex == playerActionQueue.count
         
         
     }
@@ -144,7 +168,7 @@ class GameboardNode : SCNNode {
     func runActionQueue() async {
         while true {
             if gameover {
-                continue
+                break
             }
             await runNextPlayerAction()
         }
@@ -168,6 +192,23 @@ class GameboardNode : SCNNode {
             referenceNode.position.y = 0.009
             referenceNode.position.z = finalPosition.z
         }
+        let objective = level.objective
+        
+        let url = Bundle.main.url(forResource: objective.meshName, withExtension: "scn" )!
+        let referenceNode = SCNReferenceNode(url: url)!
+        obstacleParent.addChildNode(referenceNode)
+        SCNTransaction.begin()
+        referenceNode.load()
+        SCNTransaction.commit()
+        
+        let finalPosition = board2scene(from: objective.boardPosition)
+        
+        referenceNode.position.x = finalPosition.x
+        referenceNode.position.y = 0.025
+        referenceNode.position.z = finalPosition.z
+        
+        referenceNode.runAction(SCNAction.repeatForever(SCNAction.rotateBy(x: 0, y: .pi, z: 0, duration: 5)))
+        
     }
     
 }

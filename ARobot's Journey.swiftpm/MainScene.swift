@@ -8,16 +8,34 @@ struct BoardPossibleLocation {
 }
 
 class ARController: UIViewController, ARSCNViewDelegate {
-    let arView = ARSCNView(frame: .zero)
+    var arView = ARSCNView(frame: .zero)
     var board : SCNNode?
     var possibleBoardLocations : [BoardPossibleLocation] = []
+    var hud : BoardHud!
     
-    override func viewDidLoad() {
+    func createArView () {
+        arView = ARSCNView(frame: .zero)
         self.view = arView;
+        //arView.autoenablesDefaultLighting = false
+        //arView.automaticallyUpdatesLighting = false
         arView.scene = SCNScene()
-        arView.autoenablesDefaultLighting = true
+        arView.scene.rootNode.light = nil
         arView.delegate = self;
         arView.showsStatistics = true
+        hud = BoardHud.createHUD(reset: self.restart)
+        arView.overlaySKScene = hud
+        
+    }
+    
+    override func viewDidLoad() {
+        
+        var cfURL = Bundle.main.url(forResource: "Sketchbones-RpeE", withExtension: "ttf")! as CFURL
+        CTFontManagerRegisterFontsForURL(cfURL, CTFontManagerScope.process, nil)
+        cfURL = Bundle.main.url(forResource: "TreasureMapDeadhand-yLA3", withExtension: "ttf")! as CFURL
+        CTFontManagerRegisterFontsForURL(cfURL, CTFontManagerScope.process, nil)
+        
+        
+        createArView()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -36,6 +54,10 @@ class ARController: UIViewController, ARSCNViewDelegate {
     func renderer(_ renderer: SCNSceneRenderer, didAdd node: SCNNode, for anchor: ARAnchor) {
         // Place content only for anchors found by plane detection.
         guard let planeAnchor = anchor as? ARPlaneAnchor else { return }
+        
+        if board != nil {
+            return
+        }
         
         
         let url = Bundle.main.url(forResource: "BoardStart", withExtension: "scn" )!
@@ -70,9 +92,23 @@ class ARController: UIViewController, ARSCNViewDelegate {
     }
     
     func createGameboard(node: SCNNode, anchor: ARPlaneAnchor) {
-        board = GameboardNode.newGameboard()
+        board = GameboardNode.newGameboard(hud: hud)
         board!.simdPosition = SIMD3<Float>(anchor.center.x, 0, anchor.center.z)
         node.addChildNode(board!)
     }
-}
+    
+    func restart() {
+        board?.removeFromParentNode()
+        board = nil
+        arView.session.pause()
+        hud = BoardHud.createHUD(reset: self.restart)
+        arView.overlaySKScene = hud
+        
+        // Create a session configuration
+        let configuration = ARWorldTrackingConfiguration()
 
+        // Detect horizontal planes in the scene
+        configuration.planeDetection = .horizontal
+        arView.session.run(configuration, options: [.resetTracking, .removeExistingAnchors])
+    }
+}

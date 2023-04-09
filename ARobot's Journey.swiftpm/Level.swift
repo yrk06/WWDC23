@@ -8,9 +8,11 @@
 class GameLevel {
     var elements : [BoardElement]
     var collisionTiles : [Int]
+    var objective : BoardElement
     
-    init(elements: [BoardElement]) {
+    init(elements: [BoardElement], objective: BoardElement) {
         self.elements = elements
+        self.objective = objective
         collisionTiles = []
         
         for obstacle in elements {
