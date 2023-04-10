@@ -47,8 +47,10 @@ class BoardHud: SKScene {
                 label.fontColor = UIColor.black
                 board.addChild(label)
             
+            let showUp = SKAction.moveBy(x: -512, y: 0, duration: 0.5)
+            showUp.timingMode = .easeOut
             board.position.x = 256
-            board.run(SKAction.moveBy(x: -512, y: 0, duration: 0.5))
+            board.run(showUp)
             let realIndex = index > 4 ? 5 : index
             board.position.y = CGFloat(-(196/2) - (204 * realIndex))
             anchor?.addChild(board)
@@ -69,11 +71,15 @@ class BoardHud: SKScene {
                 if index > 4 {
                     break
                 }
-                await remainingAction.run(SKAction.moveTo(x: 512, duration: 0.25))
+                let exit = SKAction.moveTo(x: 512, duration: 0.25)
+                exit.timingMode = .easeIn
+                await remainingAction.run(exit)
             }
             
             let gameover = childNode(withName: "//Gameover")!
-            await gameover.run(SKAction.moveTo(x: -256, duration: 0.5))
+            let gameOverEntry = SKAction.moveTo(x: -256, duration: 0.5)
+            gameOverEntry.timingMode = .easeOut
+            await gameover.run(gameOverEntry)
         }
         
     }
@@ -82,14 +88,22 @@ class BoardHud: SKScene {
         
         let action = listOfActions.remove(at: 0)
         
-        await action.run(SKAction.moveTo(x: 512, duration: 0.2))
-            action.removeFromParent()
-            for (index , remainingAction) in listOfActions.enumerated() {
-                if index > 4 {
-                    break
-                }
-                await remainingAction.run(SKAction.move(by: CGVector(dx: 0, dy: 204), duration: 0.1))
+        let fallOut = SKAction.moveTo(x: 512, duration: 0.2)
+        fallOut.timingMode = .easeIn
+        
+        await action.run(fallOut)
+        action.removeFromParent()
+        
+        let rise = SKAction.move(by: CGVector(dx: 0, dy: 204), duration: 0.1)
+        rise.timingMode = .easeInEaseOut
+        
+        for (index , remainingAction) in listOfActions.enumerated() {
+            if index > 4 {
+                break
             }
+            
+            await remainingAction.run(rise)
+        }
     }
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         

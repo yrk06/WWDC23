@@ -24,17 +24,17 @@ class GameboardNode : SCNNode {
         referenceNode.load()
         SCNTransaction.commit()
         
-        let ship = node.childNode(withName: "ship_light_wood", recursively: true)
+//        let ship = node.childNode(withName: "ship_light_wood", recursively: true)
         
-        let rockAnimation = CABasicAnimation(keyPath: "transform.euler.z")
-        rockAnimation.fromValue = (-7 * Float.pi) / 180
-        rockAnimation.toValue = (7 * Float.pi) / 180
-        rockAnimation.autoreverses = true
-        rockAnimation.repeatCount = .infinity
-        rockAnimation.duration = 5
-        rockAnimation.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeInEaseOut)
-        //ship?.addAnimation(floatAnimation, forKey: nil)
-        ship?.addAnimation(rockAnimation, forKey: nil)
+//        let rockAnimation = CABasicAnimation(keyPath: "transform.euler.z")
+//        rockAnimation.fromValue = (-7 * Float.pi) / 180
+//        rockAnimation.toValue = (7 * Float.pi) / 180
+//        rockAnimation.autoreverses = true
+//        rockAnimation.repeatCount = .infinity
+//        rockAnimation.duration = 5
+//        rockAnimation.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeInEaseOut)
+//        //ship?.addAnimation(floatAnimation, forKey: nil)
+//        ship?.addAnimation(rockAnimation, forKey: nil)
         
         
         let gridPieceNode = node.childNode(withName: "gridPiece", recursively: true)!
@@ -57,7 +57,7 @@ class GameboardNode : SCNNode {
         node.loadLevel(level: GameLevel(elements: [
             BoardElement(boardPosition: SIMD2<Int>(6,1), boardSize: SIMD2<Int>(2,2), meshName: "tower"),
             BoardElement(boardPosition: SIMD2<Int>(6,6), boardSize: SIMD2<Int>(2,2), meshName: "tower"),
-            BoardElement(boardPosition: SIMD2<Int>(1,6), boardSize: SIMD2<Int>(2,2), meshName: "tower"),
+            BoardElement(boardPosition: SIMD2<Int>(1,7), boardSize: SIMD2<Int>(2,2), meshName: "tower"),
             BoardElement(boardPosition: SIMD2<Int>(1,1), boardSize: SIMD2<Int>(2,2), meshName: "tower"),
         ],objective: BoardElement(boardPosition: SIMD2<Int>(8,8), boardSize: SIMD2<Int>(1,1), meshName: "chest")))
         
