@@ -9,7 +9,7 @@ struct BoardPossibleLocation {
 
 class ARController: UIViewController, ARSCNViewDelegate {
     var arView = ARSCNView(frame: .zero)
-    var board : SCNNode?
+    var board : GameboardNode?
     var possibleBoardLocations : [BoardPossibleLocation] = []
     var hud : BoardHud!
     
@@ -22,9 +22,6 @@ class ARController: UIViewController, ARSCNViewDelegate {
         arView.scene.rootNode.light = nil
         arView.delegate = self;
         arView.showsStatistics = true
-        hud = BoardHud.createHUD(reset: self.restart)
-        arView.overlaySKScene = hud
-        
     }
     
     override func viewDidLoad() {
@@ -42,13 +39,7 @@ class ARController: UIViewController, ARSCNViewDelegate {
         super.viewWillAppear(animated)
 
         // Create a session configuration
-        let configuration = ARWorldTrackingConfiguration()
-
-        // Detect horizontal planes in the scene
-        configuration.planeDetection = .horizontal
-
-        // Run the view's session
-        arView.session.run(configuration)
+        restart()
     }
     
     func renderer(_ renderer: SCNSceneRenderer, didAdd node: SCNNode, for anchor: ARAnchor) {
@@ -95,13 +86,16 @@ class ARController: UIViewController, ARSCNViewDelegate {
         board = GameboardNode.newGameboard(hud: hud)
         board!.simdPosition = SIMD3<Float>(anchor.center.x, 0, anchor.center.z)
         node.addChildNode(board!)
+        hud.isUserInteractionEnabled = true
     }
     
     func restart() {
         board?.removeFromParentNode()
         board = nil
         arView.session.pause()
-        hud = BoardHud.createHUD(reset: self.restart)
+        hud = BoardHud.createHUD(reset: self.restart, onStart: {
+            self.board?.runGame()
+        })
         arView.overlaySKScene = hud
         
         // Create a session configuration

@@ -13,7 +13,7 @@ class GameboardNode : SCNNode {
     var gameover = false
     var hud : BoardHud!
     
-    static func newGameboard(hud: BoardHud) -> SCNNode {
+    static func newGameboard(hud: BoardHud) -> GameboardNode {
         
         let node = GameboardNode()
         node.hud = hud
@@ -67,20 +67,6 @@ class GameboardNode : SCNNode {
         
         
         
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-            hud.createListOfActions(list: node.playerActionQueue)
-            
-            DispatchQueue.main.asyncAfter(deadline: .now() + 3){
-                Task {
-                    await node.runActionQueue()
-                }
-            }
-            
-        }
-        
-        
-        
         return node
     }
     
@@ -109,6 +95,17 @@ class GameboardNode : SCNNode {
         PlayerAction(distance: 0, rotate: -1),
     
     ]
+    
+    func runGame() {
+        hud.createListOfActions(list: playerActionQueue)
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3){
+            Task {
+                await self.runActionQueue()
+            }
+        }
+    }
+    
     func runNextPlayerAction() async {
         let action = playerActionQueue[playerActionIndex]
         
