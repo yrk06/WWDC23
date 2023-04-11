@@ -11,6 +11,7 @@ class GameboardNode : SCNNode {
     var level : GameLevel? = nil
     var playerController : PlayerController? = nil
     var gameover = false
+    var playerWon = false
     var hud : BoardHud!
     
     static func newGameboard(hud: BoardHud) -> GameboardNode {
@@ -51,21 +52,29 @@ class GameboardNode : SCNNode {
                 gridBase.addChildNode(clone)
                 clone.position.x = xcoord
                 clone.position.z = zcoord
+                //clone.position.y += Float(x) / 100.0
             }
         }
         
         node.loadLevel(level: GameLevel(elements: [
             BoardElement(boardPosition: SIMD2<Int>(6,1), boardSize: SIMD2<Int>(2,2), meshName: "tower"),
             BoardElement(boardPosition: SIMD2<Int>(6,6), boardSize: SIMD2<Int>(2,2), meshName: "tower"),
-            BoardElement(boardPosition: SIMD2<Int>(1,7), boardSize: SIMD2<Int>(2,2), meshName: "tower"),
+            BoardElement(boardPosition: SIMD2<Int>(1,6), boardSize: SIMD2<Int>(2,2), meshName: "tower"),
             BoardElement(boardPosition: SIMD2<Int>(1,1), boardSize: SIMD2<Int>(2,2), meshName: "tower"),
+            BoardElement(boardPosition: SIMD2<Int>(1,3), boardSize: SIMD2<Int>(1,1), meshName: "rock"),
+            BoardElement(boardPosition: SIMD2<Int>(1,0), boardSize: SIMD2<Int>(1,1), meshName: "stone"),
+            BoardElement(boardPosition: SIMD2<Int>(3,8), boardSize: SIMD2<Int>(1,1), meshName: "stone"),
         ],objective: BoardElement(boardPosition: SIMD2<Int>(8,8), boardSize: SIMD2<Int>(1,1), meshName: "chest")))
         
         node.playerController = PlayerController(at: SIMD2<Int>(0,0))
         
         node.addChildNode(node.playerController!)
         
+        node.scale = SCNVector3(0, 0, 0)
         
+        let scaleUp = SCNAction.scale(to: 1, duration: 1)
+        scaleUp.timingMode = .easeInEaseOut
+        node.runAction(scaleUp)
         
         return node
     }
@@ -147,12 +156,17 @@ class GameboardNode : SCNNode {
                 }
             }
             
-            if nextPos == level?.objective.boardPosition {
-                print("I have achieved the objective")
-                gameover = true
-            }
+            
             
             await playerController!.updatePosition(tiles: 1,isFirst: p == 0, isLast: p == (action.distance - 1) )
+            
+            if nextPos == level?.objective.boardPosition {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                    self.hud.hideSideBar()
+                    self.hud.showWinBar()
+                }
+                playerWon = true
+            }
         }
         
         await hud.consumeAction()
@@ -164,7 +178,7 @@ class GameboardNode : SCNNode {
     
     func runActionQueue() async {
         while true {
-            if gameover {
+            if gameover || playerWon {
                 break
             }
             await runNextPlayerAction()
@@ -183,11 +197,18 @@ class GameboardNode : SCNNode {
             referenceNode.load()
             SCNTransaction.commit()
             
-            let finalPosition = board2scene(from: obstacle.boardPosition)
+            var finalPosition = board2scene(from: obstacle.boardPosition)
+            
+            finalPosition.x += 0.01 * Float(obstacle.boardSize.x - 1)
+            finalPosition.z += 0.01 * Float(obstacle.boardSize.y - 1)
             
             referenceNode.position.x = finalPosition.x
             referenceNode.position.y = 0.009
             referenceNode.position.z = finalPosition.z
+            
+            referenceNode.eulerAngles.y = Float.random(in: 0..<1) * 2 * .pi
+            
+            //referenceNode.scale = SCNVector3(0.001, 0.001, 0.001)
         }
         let objective = level.objective
         

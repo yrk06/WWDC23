@@ -22,6 +22,30 @@ class ARController: UIViewController, ARSCNViewDelegate {
         arView.scene.rootNode.light = nil
         arView.delegate = self;
         arView.showsStatistics = true
+        //restart()
+        
+        
+        let skView = SKView(frame: .zero)
+        let scene = SKScene()
+        skView.showsFPS = true
+        skView.backgroundColor = .clear
+        scene.size = CGSize(width: 200, height: 200)
+        scene.scaleMode = .aspectFit
+        scene.backgroundColor = .systemTeal
+        skView.presentScene(scene)
+//        skView.translatesAutoresizingMaskIntoConstraints = false
+//        arView.addSubview(skView)
+//
+//        NSLayoutConstraint.activate([
+//            skView.topAnchor.constraint(equalTo: arView.topAnchor),
+//            skView.leadingAnchor.constraint(equalTo: arView.leadingAnchor),
+//            skView.trailingAnchor.constraint(equalTo: arView.trailingAnchor),
+//            skView.bottomAnchor.constraint(equalTo: arView.bottomAnchor),
+//        ])
+        
+        
+        
+        
     }
     
     override func viewDidLoad() {
@@ -87,6 +111,7 @@ class ARController: UIViewController, ARSCNViewDelegate {
         board!.simdPosition = SIMD3<Float>(anchor.center.x, 0, anchor.center.z)
         node.addChildNode(board!)
         hud.isUserInteractionEnabled = true
+        hud.showSideBar()
     }
     
     func restart() {

@@ -29,7 +29,7 @@ class PlayerController : SCNNode {
         
         let scenePos = board2scene(from: boardPosition)
         self.position.x =  scenePos.x
-        self.position.y = 0.009
+        self.position.y = 0.007
         self.position.z =  scenePos.z
         
         self.eulerAngles.y = .pi

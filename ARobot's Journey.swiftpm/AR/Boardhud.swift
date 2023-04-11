@@ -32,6 +32,7 @@ class BoardHud: SKScene {
         blur.filter = CIFilter(name: "CIGaussianBlur", parameters: ["inputRadius": 75])
         //hud.addChild(actualHud)
         
+        
         return hud
     }
     
@@ -98,6 +99,27 @@ class BoardHud: SKScene {
         
     }
     
+    func showSideBar() {
+        let drawer = childNode(withName: "//NextMovement")!
+        let moveIn = SKAction.moveTo(x: 1366, duration: 1)
+        moveIn.timingMode = .easeOut
+        drawer.run(moveIn)
+    }
+    
+    func hideSideBar() {
+        let drawer = childNode(withName: "//NextMovement")!
+        let moveIn = SKAction.moveTo(x: 1760, duration: 1)
+        moveIn.timingMode = .easeOut
+        drawer.run(moveIn)
+    }
+    
+    func showWinBar() {
+        let win = childNode(withName: "//Win")
+        let scaleUp = SKAction.scale(to: 1, duration: 1)
+        scaleUp.timingMode = .easeInEaseOut
+        win?.run(scaleUp)
+    }
+    
     func consumeAction() async {
         
         let action = listOfActions.remove(at: 0)
@@ -123,6 +145,7 @@ class BoardHud: SKScene {
         
         let restartButton = childNode(withName: "//restart")!
         let startButton = childNode(withName: "//startButton")!
+        let continueButton = childNode(withName: "//continue")!
 
         for touch in touches {
             let location = touch.location(in: self)
@@ -135,6 +158,10 @@ class BoardHud: SKScene {
                 let startNode = childNode(withName: "//Start")
                 startNode?.isHidden = true
                 onStartButtonPressed()
+            }
+            
+            if continueButton.contains(continueButton.parent!.convert(location, from: self)) {
+                reset()
             }
             
         }
