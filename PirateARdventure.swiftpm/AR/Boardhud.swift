@@ -53,7 +53,7 @@ class BoardHud: SKScene {
                 } else {
                     label.text = "\(index+1). Forward \(abs(action.distance) == 1 ? "once" : "\(abs(action.distance)) times")"
                 }
-                label.fontName = "Treasure Map Deadhand"
+                label.fontName = "Nanum Pen"
                 label.fontSize = 64
                 label.horizontalAlignmentMode = .center
                 label.verticalAlignmentMode = .center

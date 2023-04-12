@@ -6,7 +6,10 @@
 //
 import SceneKit
 
-struct PlayerAction {
+struct PlayerAction: Identifiable {
+    
+    var id = UUID()
+    
     var distance : Int
     var rotate: Int
 }

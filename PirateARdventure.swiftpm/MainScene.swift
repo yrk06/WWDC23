@@ -49,13 +49,6 @@ class ARController: UIViewController, ARSCNViewDelegate {
     }
     
     override func viewDidLoad() {
-        
-        var cfURL = Bundle.main.url(forResource: "Sketchbones-RpeE", withExtension: "ttf")! as CFURL
-        CTFontManagerRegisterFontsForURL(cfURL, CTFontManagerScope.process, nil)
-        cfURL = Bundle.main.url(forResource: "TreasureMapDeadhand-yLA3", withExtension: "ttf")! as CFURL
-        CTFontManagerRegisterFontsForURL(cfURL, CTFontManagerScope.process, nil)
-        
-        
         createArView()
     }
     

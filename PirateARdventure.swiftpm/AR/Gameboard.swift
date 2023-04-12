@@ -12,9 +12,9 @@ class GameboardNode : SCNNode {
     var playerController : PlayerController? = nil
     var gameover = false
     var playerWon = false
-    var hud : BoardHud!
+    var hud : BoardHud? = nil
     
-    static func newGameboard(hud: BoardHud) -> GameboardNode {
+    static func newGameboard(hud: BoardHud?) -> GameboardNode {
         
         let node = GameboardNode()
         node.hud = hud
@@ -58,7 +58,7 @@ class GameboardNode : SCNNode {
         
         node.loadLevel(level: GameLevel(elements: [
             BoardElement(boardPosition: SIMD2<Int>(6,1), boardSize: SIMD2<Int>(2,2), meshName: "tower"),
-            BoardElement(boardPosition: SIMD2<Int>(6,6), boardSize: SIMD2<Int>(2,2), meshName: "tower"),
+            BoardElement(boardPosition: SIMD2<Int>(4,4), boardSize: SIMD2<Int>(2,2), meshName: "tower"),
             BoardElement(boardPosition: SIMD2<Int>(1,6), boardSize: SIMD2<Int>(2,2), meshName: "tower"),
             BoardElement(boardPosition: SIMD2<Int>(1,1), boardSize: SIMD2<Int>(2,2), meshName: "tower"),
             BoardElement(boardPosition: SIMD2<Int>(1,3), boardSize: SIMD2<Int>(1,1), meshName: "rock"),
@@ -106,7 +106,7 @@ class GameboardNode : SCNNode {
     ]
     
     func runGame() {
-        hud.createListOfActions(list: playerActionQueue)
+        hud?.createListOfActions(list: playerActionQueue)
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 3){
             Task {
@@ -150,7 +150,7 @@ class GameboardNode : SCNNode {
                     fall,itSink]),rise
                     ]))
                     
-                    self.hud.setActionFailure()
+                    self.hud?.setActionFailure()
                     self.gameover = true
                     //self.playerController?.removeFromParentNode()
                 }
@@ -162,14 +162,14 @@ class GameboardNode : SCNNode {
             
             if nextPos == level?.objective.boardPosition {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                    self.hud.hideSideBar()
-                    self.hud.showWinBar()
+                    self.hud?.hideSideBar()
+                    self.hud?.showWinBar()
                 }
                 playerWon = true
             }
         }
         
-        await hud.consumeAction()
+        await hud?.consumeAction()
         playerActionIndex += 1
         gameover = gameover ? gameover : playerActionIndex == playerActionQueue.count
         
