@@ -46,6 +46,7 @@ class TutorialOverlay : SKScene {
         initializeState()
     }
     
+    // Walk over the currentState scenes
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         
         let sceneOut = childNode(withName: "./\(currentState)/Scene\(currentScene)")!

@@ -8,6 +8,8 @@
 import SwiftUI
 import SceneKit
 
+
+// The instruction editor view
 struct Editor: View {
     
     var run : (([PlayerAction])->Void) = {pa in}
@@ -135,19 +137,22 @@ struct Editor: View {
                     }
                     .background(.clear)
                     
-                    Button(action: {run(instructions)}, label: {
+                    if instructions.count > 0 {
+                        Button(action: {run(instructions)}, label: {
                         Image(systemName: "play.circle.fill")
                             .resizable()
                             .frame(maxWidth: 48,maxHeight:48)
                             .aspectRatio(1, contentMode: .fit)
                             .foregroundColor(.black)
                         Text("Run")
-                        .font(Font.custom("Nanum Pen", size: 32))
-                        .foregroundColor(.black)
-                        .padding()
-                            
+                            .font(Font.custom("Nanum Pen", size: 32))
+                            .foregroundColor(Color(red:1,green:0x58/0xFF,blue:0x58/0xFF))
+                            .padding()
+                        
                         
                     })
+                        
+                    }
                     
                     
                 }.frame(

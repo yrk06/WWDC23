@@ -7,7 +7,7 @@ struct ContentView: View {
     }
 }
 
-
+// Wrapper to use a UIKit ViewController in SwiftUi
 struct MainVCView : UIViewControllerRepresentable {
     func updateUIViewController(_ uiViewController: UIViewControllerType, context: Context) {
         

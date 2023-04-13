@@ -3,22 +3,31 @@ import SwiftUI
 import SceneKit
 import UIKit
 
+/// Structure to keep track of AR Anchors
 struct BoardPossibleLocation {
     var node : SCNNode
     var gizmo : SCNNode
     var anchor: ARPlaneAnchor
 }
 
+/// The main view controller, this class manages the entire game
 class ARController: UIViewController, ARSCNViewDelegate {
-    var arView = ARSCNView(frame: .zero)
     
+    // The 3 main views used for the game
+    var arView = ARSCNView(frame: .zero)
     var editorView = Editor()
     var tutorialView = SKView(frame: .zero)
+    var tutorialOverlay = TutorialOverlay()
+    
     var hostingController = UIHostingController(rootView: Editor())
+    
+    // References to the game objects
     var board : GameboardNode?
     var possibleBoardLocations : [BoardPossibleLocation] = []
     var hud : BoardHud!
     
+    // Levels
+    // Do edit/duplicate/add new levels if you wish to create custom levels ;)
     var currentLevel = 0
     var levels : [GameLevel] = [
         GameLevel(elements: [
@@ -43,12 +52,12 @@ class ARController: UIViewController, ARSCNViewDelegate {
         
     ]
     
-    // Create Views
+    // Create the main Views
 #if targetEnvironment(simulator)
+    // Camera is not available on the emulators, thus in that case we make a simplified top-down view for testing purposes
     var sceneView = SCNView(frame: .zero)
     func createSceneView() {
         
-        print("aaaaaa")
         sceneView = SCNView(frame: .zero)
         self.view.addSubview(sceneView)
         
@@ -67,11 +76,10 @@ class ARController: UIViewController, ARSCNViewDelegate {
     }
 #endif
     
+    // Create the main ARView for the board
     func createArView () {
         arView = ARSCNView(frame: .zero)
         self.view.addSubview(arView);
-        //arView.autoenablesDefaultLighting = false
-        //arView.automaticallyUpdatesLighting = false
         arView.scene = SCNScene()
         arView.scene.rootNode.light = nil
         arView.delegate = self;
@@ -82,28 +90,24 @@ class ARController: UIViewController, ARSCNViewDelegate {
         arView.contentMode = .scaleAspectFit
         arView.backgroundColor = .black
         
-        
-//        let skView = SKView(frame: .zero)
-//        let scene = SKScene()
-//        skView.showsFPS = true
-//        skView.backgroundColor = .clear
-//        scene.size = CGSize(width: 200, height: 200)
-//        scene.scaleMode = .aspectFit
-//        scene.backgroundColor = .systemTeal
-//        skView.presentScene(scene)
         startAR()
-        
-        
     }
     
+    // The instruction editor view
     func createEditorView() {
-        //view = UIView(frame: .zero)
-        pauseAR()
-        editorView = Editor(run: runLevel, level: levels[currentLevel], instructions: instructionSet)
-        hostingController = UIHostingController(rootView: editorView)
+        pauseAR() // Save a few resources... I hope
         
+        editorView = Editor(run: runLevel, level: levels[currentLevel], instructions: instructionSet)
+        
+        /* Editor View is a swiftUI View so I need to wrap it
+         * Yes, it's a swiftUI being wrapped into a UIView in a
+         * ViewController that is also being wrapped in a swiftUI view
+         * Hopefully that impact the performance too much
+         */
+        hostingController = UIHostingController(rootView: editorView)
         scaleView(hostingController.view)
         
+        // Some properties that need to be set and functions that need to be called
         hostingController.view.contentMode = .scaleAspectFit
         hostingController.view.backgroundColor = .black
         addChild(hostingController)
@@ -112,10 +116,13 @@ class ARController: UIViewController, ARSCNViewDelegate {
         hostingController.view.frame = view.bounds
     }
     
+    // The tutorial view
     func createTutorialView() {
-        tutorialView.presentScene(TutorialOverlay.createTutorialOverlay())
+        tutorialOverlay = TutorialOverlay.createTutorialOverlay()
+        tutorialView.presentScene(tutorialOverlay)
         scaleView(tutorialView)
         tutorialView.backgroundColor = .black
+        tutorialOverlay.runOnboarding()
         
         view.addSubview(tutorialView)
         
@@ -123,7 +130,7 @@ class ARController: UIViewController, ARSCNViewDelegate {
     
     // VIEW SIZING
     
-    
+    // Make sure the frame sizes are all updated when the screen is rotated
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         super.viewWillTransition(to: size, with: coordinator)
         
@@ -137,6 +144,7 @@ class ARController: UIViewController, ARSCNViewDelegate {
         
     }
     
+    // Calculate the width and height based on an Ipad Pro Aspect ratio
     func scaleView(_ v : UIView) {
         var size = UIScreen.main.bounds.size
         size.height -= 50
@@ -157,6 +165,7 @@ class ARController: UIViewController, ARSCNViewDelegate {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
+        // These views are all stacked, we only show/hide whenever we need navigation
         #if targetEnvironment(simulator)
             createSceneView()
         #else
@@ -165,7 +174,7 @@ class ARController: UIViewController, ARSCNViewDelegate {
         createEditorView()
         createTutorialView()
         
-        
+        // Make sure to properly set their frames
         #if targetEnvironment(simulator)
         scaleView(sceneView)
         #else
@@ -176,11 +185,12 @@ class ARController: UIViewController, ARSCNViewDelegate {
         
     }
     
+    // GameLogic
     
-    
-    
+    // These are the instructions that the boat will run
     var instructionSet : [PlayerAction] = []
     
+    // start the AR (or 3D scene in simulator) with the instructions and the level
     func runLevel(instructions: [PlayerAction]) {
         instructionSet = instructions
         
@@ -191,6 +201,7 @@ class ARController: UIViewController, ARSCNViewDelegate {
         startAR()
     }
     
+    // Game callback if the player gets the objective or not
     func tryAgain() {
         createEditorView()
     }
@@ -205,7 +216,7 @@ class ARController: UIViewController, ARSCNViewDelegate {
     }
     
     
-    
+    // This is called when ARKit finds a new anchor
     func renderer(_ renderer: SCNSceneRenderer, didAdd node: SCNNode, for anchor: ARAnchor) {
         // Place content only for anchors found by plane detection.
         guard let planeAnchor = anchor as? ARPlaneAnchor else { return }
@@ -214,19 +225,24 @@ class ARController: UIViewController, ARSCNViewDelegate {
             return
         }
         
-        
+        /* There is some logic to show a "start" button
+         * this is done in order to let the player choose
+         * which surface they want to place the board in.
+         */
         let url = Bundle.main.url(forResource: "BoardStart", withExtension: "scn" )!
         let sphere = SCNReferenceNode(url: url)!
         SCNTransaction.begin()
         sphere.load()
         SCNTransaction.commit()
         
-        //let sphere = SCNNode(geometry: SCNSphere(radius: 0.05))
         sphere.simdPosition = SIMD3<Float>(planeAnchor.center.x,0.05,planeAnchor.center.z)
         node.addChildNode(sphere)
+        
+        //Save this as one of the possible locations
         possibleBoardLocations.append(BoardPossibleLocation(node: node, gizmo: sphere, anchor: planeAnchor))
     }
     
+    // Detect when one of the possible locations was choosen
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard board == nil else {
             return
@@ -246,6 +262,7 @@ class ARController: UIViewController, ARSCNViewDelegate {
         createGameboard(node: anchorInfo!.node, anchor: anchorInfo!.anchor)
     }
     
+    
     func createGameboard(node: SCNNode, anchor: ARPlaneAnchor) {
         board = GameboardNode.newGameboard(hud: hud,level: levels[currentLevel], instructions: instructionSet)
         board!.simdPosition = SIMD3<Float>(anchor.center.x, 0, anchor.center.z)
@@ -254,11 +271,13 @@ class ARController: UIViewController, ARSCNViewDelegate {
         hud.showSideBar()
     }
     
+    
     func pauseAR() {
         arView.session.pause()
     }
     
 #if targetEnvironment(simulator)
+    // Mock the AR for the simulator
     func startAR() {
         board?.removeFromParentNode()
         
@@ -273,9 +292,12 @@ class ARController: UIViewController, ARSCNViewDelegate {
     }
 #else
     func startAR() {
+        // Remove the old board
         board?.removeFromParentNode()
         board = nil
         arView.session.pause()
+        
+        // Add a new hud
         hud = BoardHud.createHUD(reset: self.startAR, onStart: {
             self.board?.runGame()
         },onWin: nextLevel, onLose: tryAgain)

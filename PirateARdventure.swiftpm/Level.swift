@@ -5,6 +5,8 @@
 //  Created by Yerik Koslowski on 05/04/23.
 //
 
+
+/// Class for defining game levels
 class GameLevel {
     var elements : [BoardElement]
     var collisionTiles : [Int]

@@ -6,6 +6,7 @@
 //
 import SceneKit
 
+// An instruction for the ship
 struct PlayerAction: Identifiable {
     
     var id = UUID()
@@ -54,10 +55,11 @@ struct PlayerAction: Identifiable {
     }
 }
 
-
+// The ship
 class PlayerController : SCNNode {
     var boardPosition : SIMD2<Int>
-    // Do stuff (?)
+
+    
     init(at: SIMD2<Int>) {
         self.boardPosition = at
         super.init()
@@ -82,6 +84,7 @@ class PlayerController : SCNNode {
         fatalError("init(coder:) has not been implemented")
     }
     
+    // Rotate the ship
     func updateRotation(rotation: Int) async {
         let angle = -.pi / 2 * Float(rotation)
         let rotationAction = SCNAction.rotateBy(x: 0, y: CGFloat(angle), z: 0, duration: Double(abs(rotation)) * 3.0)
@@ -89,24 +92,7 @@ class PlayerController : SCNNode {
         await self.runAction(rotationAction)
     }
     
-    func getForwardPosition(tiles: Int) -> SIMD2<Int> {
-        
-        //Convert forward vector to scene coordinates
-        let worldForward = self.convertVector(SCNVector3(0, 0, -1 * tiles), to: self.parent)
-        
-        //Forward in Board Pos
-        return SIMD2<Int>(Int(round(worldForward.x)) + self.boardPosition.x,
-                            Int(round(worldForward.z)) + self.boardPosition.y)
-    }
-    
-    func getPlayerForwardVector() -> SCNVector3 {
-        return self.convertVector(SCNVector3(0, 0, -1), to: self.parent)
-    }
-    
-    func getPlayerRightVector() -> SCNVector3 {
-        return self.convertVector(SCNVector3(1, 0, 0), to: self.parent)
-    }
-    
+    // Move ship forward
     func updatePosition(tiles: Int, isFirst : Bool = false, isLast : Bool = false) async {
         
         let to = getForwardPosition(tiles: tiles)
@@ -127,6 +113,28 @@ class PlayerController : SCNNode {
         }
         await self.runAction(movement)
     }
+    
+    // Functions to convert from ship coordinates into board coordinates
+    
+    func getForwardPosition(tiles: Int) -> SIMD2<Int> {
+        
+        //Convert forward vector to scene coordinates
+        let worldForward = self.convertVector(SCNVector3(0, 0, -1 * tiles), to: self.parent)
+        
+        //Forward in Board Pos
+        return SIMD2<Int>(Int(round(worldForward.x)) + self.boardPosition.x,
+                            Int(round(worldForward.z)) + self.boardPosition.y)
+    }
+    
+    func getPlayerForwardVector() -> SCNVector3 {
+        return self.convertVector(SCNVector3(0, 0, -1), to: self.parent)
+    }
+    
+    func getPlayerRightVector() -> SCNVector3 {
+        return self.convertVector(SCNVector3(1, 0, 0), to: self.parent)
+    }
+    
+    
     
     
 }

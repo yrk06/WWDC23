@@ -45,6 +45,7 @@ class BoardHud: SKScene {
         print("HUD added")
     }
     
+    // Add the wooden signs for the instructions on the hud
     func createListOfActions(list : [PlayerAction]) {
         let anchor = self.childNode(withName: "//NextMovement")
         
@@ -122,7 +123,7 @@ class BoardHud: SKScene {
         drawer.run(moveIn)
     }
     
-    func showWinBar() {
+    func showWinPrompt() {
         let win = childNode(withName: "//Win")
         let scaleUp = SKAction.scale(to: 1, duration: 1)
         scaleUp.timingMode = .easeInEaseOut
@@ -150,6 +151,8 @@ class BoardHud: SKScene {
             await remainingAction.run(rise)
         }
     }
+    
+    //Detect presses on "Run" "Try Again" "Continue"
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         
         let restartButton = childNode(withName: "//restart")!

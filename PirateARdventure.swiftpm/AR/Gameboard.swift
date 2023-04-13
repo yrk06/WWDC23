@@ -19,6 +19,8 @@ class GameboardNode : SCNNode {
         
         let node = GameboardNode()
         node.hud = hud
+        
+        //Create the game board
         let url = Bundle.main.url(forResource: "Gameboard", withExtension: "scn" )!
         let referenceNode = SCNReferenceNode(url: url)!
         node.addChildNode(referenceNode)
@@ -26,20 +28,7 @@ class GameboardNode : SCNNode {
         referenceNode.load()
         SCNTransaction.commit()
         
-//        let ship = node.childNode(withName: "ship_light_wood", recursively: true)
-        
-//        let rockAnimation = CABasicAnimation(keyPath: "transform.euler.z")
-//        rockAnimation.fromValue = (-7 * Float.pi) / 180
-//        rockAnimation.toValue = (7 * Float.pi) / 180
-//        rockAnimation.autoreverses = true
-//        rockAnimation.repeatCount = .infinity
-//        rockAnimation.duration = 5
-//        rockAnimation.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeInEaseOut)
-//        //ship?.addAnimation(floatAnimation, forKey: nil)
-//        ship?.addAnimation(rockAnimation, forKey: nil)
-        
-        
-        let gridPieceNode = node.childNode(withName: "gridPiece", recursively: true)!
+        // Create the 3D grid
         let gridBase = node.childNode(withName: "grid", recursively: true)!
         //Create X lines
         for x in 1..<9 {
@@ -54,7 +43,7 @@ class GameboardNode : SCNNode {
                 circle.position.y = 0.01
             }
         }
-        
+        // Create Z lines
         for z in 1..<9 {
             for x in 1..<36 {
                 let xcoord = -0.09 + 0.005 * Float(x)
@@ -67,22 +56,13 @@ class GameboardNode : SCNNode {
                 circle.position.y = 0.01
             }
         }
+        
         node.loadLevel(level: level)
         node.playerActionQueue = instructions
-//        node.loadLevel(level: GameLevel(elements: [
-//            BoardElement(boardPosition: SIMD2<Int>(6,1), boardSize: SIMD2<Int>(2,2), meshName: "tower"),
-//            BoardElement(boardPosition: SIMD2<Int>(4,4), boardSize: SIMD2<Int>(2,2), meshName: "tower"),
-//            BoardElement(boardPosition: SIMD2<Int>(1,6), boardSize: SIMD2<Int>(2,2), meshName: "tower"),
-//            BoardElement(boardPosition: SIMD2<Int>(1,1), boardSize: SIMD2<Int>(2,2), meshName: "tower"),
-//            BoardElement(boardPosition: SIMD2<Int>(1,3), boardSize: SIMD2<Int>(1,1), meshName: "rock"),
-//            BoardElement(boardPosition: SIMD2<Int>(1,0), boardSize: SIMD2<Int>(1,1), meshName: "stone"),
-//            BoardElement(boardPosition: SIMD2<Int>(3,8), boardSize: SIMD2<Int>(1,1), meshName: "stone"),
-//        ],objective: BoardElement(boardPosition: SIMD2<Int>(8,8), boardSize: SIMD2<Int>(1,1), meshName: "chest")))
         
         
-        
+        //Animation
         node.scale = SCNVector3(0, 0, 0)
-        
         let scaleUp = SCNAction.scale(to: 1, duration: 1)
         scaleUp.timingMode = .easeInEaseOut
         node.runAction(scaleUp)
@@ -91,31 +71,9 @@ class GameboardNode : SCNNode {
     }
     
     var playerActionIndex = 0
-    var playerActionQueue = [
-        
-        PlayerAction(distance: 1, rotate: 0),
-        PlayerAction(distance: 7, rotate: 0),
-        PlayerAction(distance: 0, rotate: -1),
-        
-        PlayerAction(distance: 8, rotate: 0),
-        PlayerAction(distance: 0, rotate: -1),
-        
-        PlayerAction(distance: 8, rotate: 0),
-        PlayerAction(distance: 0, rotate: -1),
-        
-        PlayerAction(distance: 8, rotate: 0),
-        PlayerAction(distance: 0, rotate: -1),
-        
-        PlayerAction(distance: 2, rotate: 0),
-        PlayerAction(distance: 0, rotate: 1),
-        PlayerAction(distance: 2, rotate: 0),
-        PlayerAction(distance: 0, rotate: -1),
-
-        PlayerAction(distance: 6, rotate: 0),
-        PlayerAction(distance: 0, rotate: -1),
+    var playerActionQueue: [PlayerAction] = []
     
-    ]
-    
+    // start the instruction execution
     func runGame() {
         hud?.createListOfActions(list: playerActionQueue)
         
@@ -126,6 +84,7 @@ class GameboardNode : SCNNode {
         }
     }
     
+    // Execute the action
     func runNextPlayerAction() async {
         if playerActionQueue.count == 0 {
             gameover = true
@@ -190,6 +149,7 @@ class GameboardNode : SCNNode {
         
     }
     
+    // Loop through all the instructions until a gameover of player won
     func runActionQueue() async {
         while true {
             if gameover{
@@ -199,7 +159,7 @@ class GameboardNode : SCNNode {
             if playerWon {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                     self.hud?.hideSideBar()
-                    self.hud?.showWinBar()
+                    self.hud?.showWinPrompt()
                 }
                 break
             }
@@ -207,10 +167,12 @@ class GameboardNode : SCNNode {
         }
     }
     
+    // Load a level and create all its elements and player
     func loadLevel(level: GameLevel) {
         self.level = level
         let obstacleParent = childNode(withName: "obstacles", recursively: true)!
-        // Load Level
+        
+        // Create obstacles
         for obstacle in level.elements {
             let url = Bundle.main.url(forResource: obstacle.meshName, withExtension: "scn" )!
             let referenceNode = SCNReferenceNode(url: url)!
@@ -229,9 +191,9 @@ class GameboardNode : SCNNode {
             referenceNode.position.z = finalPosition.z
             
             referenceNode.eulerAngles.y = Float.random(in: 0..<1) * 2 * .pi
-            
-            //referenceNode.scale = SCNVector3(0.001, 0.001, 0.001)
         }
+        
+        //Create objective
         let objective = level.objective
         
         let url = Bundle.main.url(forResource: objective.meshName, withExtension: "scn" )!
@@ -249,7 +211,7 @@ class GameboardNode : SCNNode {
         
         referenceNode.runAction(SCNAction.repeatForever(SCNAction.rotateBy(x: 0, y: .pi, z: 0, duration: 5)))
         
-        
+        //Create player
         playerController = PlayerController(at: level.playerStart)
         
         addChildNode(playerController!)

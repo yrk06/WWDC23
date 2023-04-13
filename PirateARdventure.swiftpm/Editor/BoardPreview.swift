@@ -8,6 +8,7 @@
 import SceneKit
 import SwiftUI
 
+// Just a simple class to load the gameboard as a preview in the editor
 class BoardPreview : SCNView {
     
     static func createBoardPreview(level: GameLevel) -> BoardPreview {
