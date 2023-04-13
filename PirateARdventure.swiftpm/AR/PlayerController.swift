@@ -84,7 +84,7 @@ class PlayerController : SCNNode {
     
     func updateRotation(rotation: Int) async {
         let angle = -.pi / 2 * Float(rotation)
-        let rotationAction = SCNAction.rotateBy(x: 0, y: CGFloat(angle), z: 0, duration: Double(abs(rotation)) * 2.0)
+        let rotationAction = SCNAction.rotateBy(x: 0, y: CGFloat(angle), z: 0, duration: Double(abs(rotation)) * 3.0)
         rotationAction.timingMode = .easeInEaseOut
         await self.runAction(rotationAction)
     }
@@ -115,7 +115,7 @@ class PlayerController : SCNNode {
         
         var scenePos = board2scene(from: to)
         scenePos.y = self.position.y
-        let moveDistance = distance(SIMD3<Float>(self.position.x,self.position.y, self.position.z), scenePos) / 0.2 * 20 // Normalize distance
+        let moveDistance = distance(SIMD3<Float>(self.position.x,self.position.y, self.position.z), scenePos) / 0.2 * 60 // Normalize distance
         let movement = SCNAction.move(to: SCNVector3(scenePos.x, self.position.y, scenePos.z), duration: Double(moveDistance))
         
         movement.timingMode = .linear

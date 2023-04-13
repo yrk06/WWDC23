@@ -15,11 +15,16 @@ class BoardHud: SKScene {
     var onStartButtonPressed : (()->Void)!
     var isStarted = false
     
-    static func createHUD(reset: (()->Void)!, onStart: (()->Void)!) -> BoardHud {
+    var onWin : (()->Void)! = {}
+    var onLose : (()->Void)! = {}
+    
+    static func createHUD(reset: (()->Void)!, onStart: (()->Void)!, onWin: (()->Void)!, onLose: (()->Void)! ) -> BoardHud {
         // Doesnt work in an actual playground, god why???
         // let hud = SKScene(fileNamed: "HUD") as! BoardHud
         let hud = BoardHud(fileNamed: "HUD")!
         hud.onStartButtonPressed = onStart
+        hud.onWin = onWin
+        hud.onLose = onLose
         
         hud.scaleMode = .aspectFit
         hud.isUserInteractionEnabled = false
@@ -45,7 +50,7 @@ class BoardHud: SKScene {
         
         for (index, action) in list.enumerated() {
             let board = SKSpriteNode(imageNamed: "sign")
-            board.size = CGSize(width: 358, height: 172)
+            board.size = CGSize(width: 512, height: 196)
             
             
             let label = SKLabelNode()
@@ -76,8 +81,11 @@ class BoardHud: SKScene {
     
     func setActionFailure() {
         self.isUserInteractionEnabled = true
-        let label = listOfActions[0].children[0] as! SKLabelNode
-        label.fontColor = UIColor.red
+        if listOfActions.count > 0 {
+            let label = listOfActions[0].children[0] as! SKLabelNode
+            label.fontColor = UIColor.red
+        }
+        
         
         Task {
             for (index , remainingAction) in listOfActions.enumerated() {
@@ -151,7 +159,7 @@ class BoardHud: SKScene {
         for touch in touches {
             let location = touch.location(in: self)
             if restartButton.contains(restartButton.parent!.convert(location, from: self)) {
-                reset()
+                onLose()
             }
             
             if !isStarted && startButton.contains(startButton.parent!.convert(location, from: self)) {
@@ -162,7 +170,7 @@ class BoardHud: SKScene {
             }
             
             if continueButton.contains(continueButton.parent!.convert(location, from: self)) {
-                reset()
+                onWin()
             }
             
         }

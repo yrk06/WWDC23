@@ -3,8 +3,7 @@ import ARKit
 
 struct ContentView: View {
     var body: some View {
-        //MainVCView()
-        SwiftUIView()
+        MainVCView()
     }
 }
 

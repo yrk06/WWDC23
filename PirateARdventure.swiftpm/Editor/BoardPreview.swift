@@ -10,7 +10,7 @@ import SwiftUI
 
 class BoardPreview : SCNView {
     
-    static func createBoardPreview() -> BoardPreview {
+    static func createBoardPreview(level: GameLevel) -> BoardPreview {
         let preview = BoardPreview()
         guard let sceneURL = Bundle.main.url(forResource: "BoardPreview", withExtension: "scn") else {
             fatalError("Unable to find BoardPreview.scn")
@@ -22,7 +22,7 @@ class BoardPreview : SCNView {
         
         preview.scene = scene
         
-        let board = GameboardNode.newGameboard(hud: nil)
+        let board = GameboardNode.newGameboard(hud: nil,level: level,instructions: [])
         
         scene.rootNode.addChildNode(board)
         
@@ -31,9 +31,12 @@ class BoardPreview : SCNView {
 }
 
 struct BoardPreviewView: UIViewRepresentable {
+    
+    var level: GameLevel
+    
     func makeUIView(context: Context) -> SCNView {
         // configure your SCNView here
-        return BoardPreview.createBoardPreview()
+        return BoardPreview.createBoardPreview(level: level)
     }
     
     func updateUIView(_ uiView: SCNView, context: Context) {

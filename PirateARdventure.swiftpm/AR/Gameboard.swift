@@ -5,6 +5,7 @@
 //  Created by Yerik Koslowski on 01/04/23.
 //
 import SceneKit
+import SwiftUI
 
 class GameboardNode : SCNNode {
     
@@ -14,7 +15,7 @@ class GameboardNode : SCNNode {
     var playerWon = false
     var hud : BoardHud? = nil
     
-    static func newGameboard(hud: BoardHud?) -> GameboardNode {
+    static func newGameboard(hud: BoardHud?, level: GameLevel, instructions : [PlayerAction]) -> GameboardNode {
         
         let node = GameboardNode()
         node.hud = hud
@@ -40,35 +41,45 @@ class GameboardNode : SCNNode {
         
         let gridPieceNode = node.childNode(withName: "gridPiece", recursively: true)!
         let gridBase = node.childNode(withName: "grid", recursively: true)!
-        // Create Grid
-        for y in 0..<9 {
-            for x in 0..<9 {
-                if x == 0 && y == 0 {
-                    continue;
-                }
-                let xcoord = -0.08 + 0.02 * Float(x)
-                let zcoord = -0.08 + 0.02 * Float(y)
-                let clone = gridPieceNode.clone()
-                gridBase.addChildNode(clone)
-                clone.position.x = xcoord
-                clone.position.z = zcoord
-                //clone.position.y += Float(x) / 100.0
+        //Create X lines
+        for x in 1..<9 {
+            for z in 1..<36 {
+                let xcoord = -0.09 + 0.02 * Float(x)
+                let zcoord = -0.09 + 0.005 * Float(z)
+                
+                let circle = SCNNode(geometry: SCNSphere(radius: 0.0005))
+                gridBase.addChildNode(circle)
+                circle.position.x = xcoord
+                circle.position.z = zcoord
+                circle.position.y = 0.01
             }
         }
         
-        node.loadLevel(level: GameLevel(elements: [
-            BoardElement(boardPosition: SIMD2<Int>(6,1), boardSize: SIMD2<Int>(2,2), meshName: "tower"),
-            BoardElement(boardPosition: SIMD2<Int>(4,4), boardSize: SIMD2<Int>(2,2), meshName: "tower"),
-            BoardElement(boardPosition: SIMD2<Int>(1,6), boardSize: SIMD2<Int>(2,2), meshName: "tower"),
-            BoardElement(boardPosition: SIMD2<Int>(1,1), boardSize: SIMD2<Int>(2,2), meshName: "tower"),
-            BoardElement(boardPosition: SIMD2<Int>(1,3), boardSize: SIMD2<Int>(1,1), meshName: "rock"),
-            BoardElement(boardPosition: SIMD2<Int>(1,0), boardSize: SIMD2<Int>(1,1), meshName: "stone"),
-            BoardElement(boardPosition: SIMD2<Int>(3,8), boardSize: SIMD2<Int>(1,1), meshName: "stone"),
-        ],objective: BoardElement(boardPosition: SIMD2<Int>(8,8), boardSize: SIMD2<Int>(1,1), meshName: "chest")))
+        for z in 1..<9 {
+            for x in 1..<36 {
+                let xcoord = -0.09 + 0.005 * Float(x)
+                let zcoord = -0.09 + 0.02 * Float(z)
+                
+                let circle = SCNNode(geometry: SCNSphere(radius: 0.0005))
+                gridBase.addChildNode(circle)
+                circle.position.x = xcoord
+                circle.position.z = zcoord
+                circle.position.y = 0.01
+            }
+        }
+        node.loadLevel(level: level)
+        node.playerActionQueue = instructions
+//        node.loadLevel(level: GameLevel(elements: [
+//            BoardElement(boardPosition: SIMD2<Int>(6,1), boardSize: SIMD2<Int>(2,2), meshName: "tower"),
+//            BoardElement(boardPosition: SIMD2<Int>(4,4), boardSize: SIMD2<Int>(2,2), meshName: "tower"),
+//            BoardElement(boardPosition: SIMD2<Int>(1,6), boardSize: SIMD2<Int>(2,2), meshName: "tower"),
+//            BoardElement(boardPosition: SIMD2<Int>(1,1), boardSize: SIMD2<Int>(2,2), meshName: "tower"),
+//            BoardElement(boardPosition: SIMD2<Int>(1,3), boardSize: SIMD2<Int>(1,1), meshName: "rock"),
+//            BoardElement(boardPosition: SIMD2<Int>(1,0), boardSize: SIMD2<Int>(1,1), meshName: "stone"),
+//            BoardElement(boardPosition: SIMD2<Int>(3,8), boardSize: SIMD2<Int>(1,1), meshName: "stone"),
+//        ],objective: BoardElement(boardPosition: SIMD2<Int>(8,8), boardSize: SIMD2<Int>(1,1), meshName: "chest")))
         
-        node.playerController = PlayerController(at: SIMD2<Int>(0,0))
         
-        node.addChildNode(node.playerController!)
         
         node.scale = SCNVector3(0, 0, 0)
         
@@ -116,6 +127,10 @@ class GameboardNode : SCNNode {
     }
     
     func runNextPlayerAction() async {
+        if playerActionQueue.count == 0 {
+            gameover = true
+            return
+        }
         let action = playerActionQueue[playerActionIndex]
         
         await playerController!.updateRotation(rotation: action.rotate)
@@ -150,35 +165,42 @@ class GameboardNode : SCNNode {
                     fall,itSink]),rise
                     ]))
                     
-                    self.hud?.setActionFailure()
                     self.gameover = true
                     //self.playerController?.removeFromParentNode()
+                
                 }
             }
             
             
             
-            await playerController!.updatePosition(tiles: 1,isFirst: p == 0, isLast: p == (action.distance - 1) )
+            await playerController!.updatePosition(tiles: 1,isFirst: p == 0, isLast: p == (action.distance - 1) || self.gameover || self.playerWon )
             
             if nextPos == level?.objective.boardPosition {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                    self.hud?.hideSideBar()
-                    self.hud?.showWinBar()
-                }
                 playerWon = true
+            }
+            if self.gameover || self.playerWon {
+                break
             }
         }
         
         await hud?.consumeAction()
         playerActionIndex += 1
-        gameover = gameover ? gameover : playerActionIndex == playerActionQueue.count
+        gameover = gameover ? gameover : playerActionIndex == playerActionQueue.count && !playerWon
         
         
     }
     
     func runActionQueue() async {
         while true {
-            if gameover || playerWon {
+            if gameover{
+                self.hud?.setActionFailure()
+                break
+            }
+            if playerWon {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                    self.hud?.hideSideBar()
+                    self.hud?.showWinBar()
+                }
                 break
             }
             await runNextPlayerAction()
@@ -227,6 +249,10 @@ class GameboardNode : SCNNode {
         
         referenceNode.runAction(SCNAction.repeatForever(SCNAction.rotateBy(x: 0, y: .pi, z: 0, duration: 5)))
         
+        
+        playerController = PlayerController(at: level.playerStart)
+        
+        addChildNode(playerController!)
     }
     
 }

@@ -9,6 +9,7 @@ class GameLevel {
     var elements : [BoardElement]
     var collisionTiles : [Int]
     var objective : BoardElement
+    var playerStart : SIMD2<Int> = .zero
     
     init(elements: [BoardElement], objective: BoardElement) {
         self.elements = elements

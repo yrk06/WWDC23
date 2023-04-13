@@ -27,10 +27,10 @@ let package = Package(
                 .phone
             ],
             supportedInterfaceOrientations: [
-                .portrait(.when(deviceFamilies: [.phone])),
+                .portrait,
                 .landscapeRight,
                 .landscapeLeft,
-                //.portraitUpsideDown(.when(deviceFamilies: [.pad]))
+                .portraitUpsideDown(.when(deviceFamilies: [.pad]))
             ],
             capabilities: [
                 .camera(purposeString: "The camera used to display the game board")
