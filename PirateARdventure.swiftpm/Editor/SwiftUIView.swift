@@ -10,7 +10,12 @@ import SceneKit
 
 struct SwiftUIView: View {
     
-    @State var instructions : [PlayerAction] = []
+    @State var instructions : [PlayerAction] = [
+        PlayerAction(distance: 1, rotate: 0),
+        PlayerAction(distance: 0, rotate: 1),
+        PlayerAction(distance: 0, rotate: -1),
+        PlayerAction(distance: 8, rotate: 0)
+    ]
     
     var body: some View {
         ZStack {
@@ -37,8 +42,20 @@ struct SwiftUIView: View {
                         )
                         .background(Color.red)
                     ScrollView() {
-                        ForEach(instructions) { action in
-                            InstructionCard(instruction: action)
+                        ForEach(Array(instructions.enumerated()), id: \.offset) { index, action in
+                            InstructionCard(instruction: action, index: index,
+                                            removeInstruction: {
+                                instructions.remove(at: index)
+                            },
+                                            increase: {
+                                instructions[index].increaseMagnitude()
+                            },
+                                            decrease: {
+                                if instructions[index].decreaseMagnitude() {
+                                    instructions.remove(at: index)
+                                }
+                            }
+                            )
                         }
                     }
                     .background(.clear)
@@ -48,6 +65,7 @@ struct SwiftUIView: View {
                             instructions.append(PlayerAction(distance: 1, rotate: 0))
                         })
                         Button("Is this just fantasy?", action: {})
+                        
                     }
                     
                     
@@ -66,45 +84,65 @@ struct SwiftUIView: View {
 struct InstructionCard: View {
     var instruction: PlayerAction
     var index: Int = 0
+    var removeInstruction : (()->Void) = {}
+    var increase : (()->Void) = {}
+    var decrease : (()->Void) = {}
     
     var body: some View {
         HStack {
+        HStack {
             HStack {
-                Label().font(Font.custom("Nanum Pen", size: 48))
+                VStack(alignment: .leading) {
+                    Text("\(index+1).")
+                        .font(Font.custom("Nanum Pen", size: 32))
+                    Text(instruction.getLabel())
+                        .font(Font.custom("Nanum Pen", size: 32))
+                    Text(instruction.getMagnitude() == 1 ? "Once":"\(instruction.getMagnitude()) Times")
+                        .font(Font.custom("Nanum Pen", size: 37))
+                        .fontWeight(.bold)
+                }
                 Spacer()
                 HStack {
-                    Button(action: {}, label: {
+                    Button(action: decrease, label: {
                         Image(systemName:"minus.circle.fill")
                             .resizable()
                             .aspectRatio(1,contentMode: .fit)
-                            .frame(maxWidth: 48)
+                            .frame(maxWidth: 32)
                             .foregroundColor(.black)
-                            
+                        
                         
                     })
                     
-                    Text("\(Count())").font(Font.custom("Nanum Pen", size: 48))
+                    Text("\(instruction.getMagnitude())").font(Font.custom("Nanum Pen", size: 64))
                     
-                    Button(action: {}, label: {
+                    Button(action: increase, label: {
                         Image(systemName:"plus.circle.fill")
                             .resizable()
                             .aspectRatio(1,contentMode: .fit)
-                            .frame(maxWidth: 48)
+                            .frame(maxWidth: 32)
                             .foregroundColor(.black)
                         
                         
                     })
                 }
-            }.padding(.leading, 64)
-                .padding(.trailing, 64)
+            }.padding(.leading, 32)
+                .padding(.trailing, 48)
             
         }
-        .frame(maxWidth: 512,maxHeight: 256)
+        .frame(maxWidth: 400,maxHeight: 200)
         .aspectRatio(CGSize(width: 2, height: 1), contentMode: .fill)
         .background(
             Image("sign")
                 .resizable()
         )
+        Button(action: removeInstruction, label: {
+            Image(systemName: "x.circle.fill")
+                .resizable()
+                .aspectRatio(1,contentMode: .fit)
+                .frame(maxWidth: 32)
+                .foregroundColor(.red)
+        })
+    }
     }
     
     func Label() -> some View {

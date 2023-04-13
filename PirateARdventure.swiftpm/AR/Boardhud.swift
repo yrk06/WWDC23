@@ -45,7 +45,8 @@ class BoardHud: SKScene {
         
         for (index, action) in list.enumerated() {
             let board = SKSpriteNode(imageNamed: "sign")
-            board.size.height = 196
+            board.size = CGSize(width: 358, height: 172)
+            
             
             let label = SKLabelNode()
                 if action.rotate != 0 {

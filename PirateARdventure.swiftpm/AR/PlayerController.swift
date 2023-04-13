@@ -12,6 +12,46 @@ struct PlayerAction: Identifiable {
     
     var distance : Int
     var rotate: Int
+    
+    func getLabel() -> String {
+        if rotate != 0 {
+            return "Rotate \(rotate > 0 ? "right" : "left")"
+        } else {
+            return "Move forward"
+        }
+    }
+    
+    func getMagnitude() -> Int {
+        return max(distance, abs(rotate))
+    }
+    
+    mutating func increaseMagnitude() {
+        if rotate != 0 {
+            if rotate > 0 {
+                rotate += 1
+            } else {
+                rotate -= 1
+            }
+            rotate = rotate > 4 ? 4 : rotate
+        } else {
+            distance += 1
+            distance = distance > 8 ? 8 : distance
+        }
+    }
+    
+    mutating func decreaseMagnitude() -> Bool {
+        if rotate != 0 {
+            if rotate > 0 {
+                rotate -= 1
+            } else {
+                rotate += 1
+            }
+            return rotate == 0
+        } else {
+            distance -= 1
+            return distance == 0
+        }
+    }
 }
 
 
