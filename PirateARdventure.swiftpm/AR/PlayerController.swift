@@ -60,7 +60,7 @@ class PlayerController : SCNNode {
     var boardPosition : SIMD2<Int>
 
     
-    init(at: SIMD2<Int>) {
+    init(at: SIMD2<Int>, rotated: Float) {
         self.boardPosition = at
         super.init()
         
@@ -77,7 +77,7 @@ class PlayerController : SCNNode {
         self.position.y = 0.007
         self.position.z =  scenePos.z
         
-        self.eulerAngles.y = .pi
+        self.eulerAngles.y = rotated
     }
     
     required init?(coder: NSCoder) {
@@ -101,7 +101,7 @@ class PlayerController : SCNNode {
         
         var scenePos = board2scene(from: to)
         scenePos.y = self.position.y
-        let moveDistance = distance(SIMD3<Float>(self.position.x,self.position.y, self.position.z), scenePos) / 0.2 * 60 // Normalize distance
+        let moveDistance = distance(SIMD3<Float>(self.position.x,self.position.y, self.position.z), scenePos) / 0.2 * 15 // Normalize distance
         let movement = SCNAction.move(to: SCNVector3(scenePos.x, self.position.y, scenePos.z), duration: Double(moveDistance))
         
         movement.timingMode = .linear

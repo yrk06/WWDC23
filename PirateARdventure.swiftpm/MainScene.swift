@@ -25,20 +25,31 @@ class ARController: UIViewController, ARSCNViewDelegate {
     var board : GameboardNode?
     var possibleBoardLocations : [BoardPossibleLocation] = []
     var hud : BoardHud!
+    // These are the instructions that the boat will run
+    var instructionSet : [PlayerAction] = [PlayerAction(distance: 1, rotate: 0)]
     
     // Levels
     // Do edit/duplicate/add new levels if you wish to create custom levels ;)
     var currentLevel = 0
     var levels : [GameLevel] = [
-        GameLevel(elements: [
-            BoardElement(boardPosition: SIMD2<Int>(6,1), boardSize: SIMD2<Int>(2,2), meshName: "tower"),
-            BoardElement(boardPosition: SIMD2<Int>(4,4), boardSize: SIMD2<Int>(2,2), meshName: "tower"),
-            BoardElement(boardPosition: SIMD2<Int>(1,6), boardSize: SIMD2<Int>(2,2), meshName: "tower"),
-            BoardElement(boardPosition: SIMD2<Int>(1,1), boardSize: SIMD2<Int>(2,2), meshName: "tower"),
-            BoardElement(boardPosition: SIMD2<Int>(1,3), boardSize: SIMD2<Int>(1,1), meshName: "rock"),
-            BoardElement(boardPosition: SIMD2<Int>(1,0), boardSize: SIMD2<Int>(1,1), meshName: "stone"),
-            BoardElement(boardPosition: SIMD2<Int>(3,8), boardSize: SIMD2<Int>(1,1), meshName: "stone"),
-        ],objective: BoardElement(boardPosition: SIMD2<Int>(0,1), boardSize: SIMD2<Int>(1,1), meshName: "chest")),
+        GameLevel(
+            elements: [
+            BoardElement(boardPosition: SIMD2<Int>(0,7), boardSize: SIMD2<Int>(2,2), meshName: "tower"),
+            BoardElement(boardPosition: SIMD2<Int>(7,7), boardSize: SIMD2<Int>(2,2), meshName: "tower"),
+            
+            BoardElement(boardPosition: SIMD2<Int>(2,6), boardSize: SIMD2<Int>(1,1), meshName: "rock"),
+            BoardElement(boardPosition: SIMD2<Int>(6,6), boardSize: SIMD2<Int>(1,1), meshName: "stone"),
+            
+            BoardElement(boardPosition: SIMD2<Int>(3,5), boardSize: SIMD2<Int>(1,1), meshName: "stone"),
+            BoardElement(boardPosition: SIMD2<Int>(5,5), boardSize: SIMD2<Int>(1,1), meshName: "rock"),
+            
+            BoardElement(boardPosition: SIMD2<Int>(2,3), boardSize: SIMD2<Int>(2,2), meshName: "tower"),
+            BoardElement(boardPosition: SIMD2<Int>(5,3), boardSize: SIMD2<Int>(2,2), meshName: "tower"),
+        ],
+            objective: BoardElement(boardPosition: SIMD2<Int>(4,3), boardSize: SIMD2<Int>(1,1), meshName: "chest"),
+            playerStart: SIMD2<Int>(4,8),
+            playerRotation: 0
+        ),
         
         GameLevel(elements: [
             BoardElement(boardPosition: SIMD2<Int>(6,1), boardSize: SIMD2<Int>(2,2), meshName: "tower"),
@@ -186,9 +197,6 @@ class ARController: UIViewController, ARSCNViewDelegate {
     }
     
     // GameLogic
-    
-    // These are the instructions that the boat will run
-    var instructionSet : [PlayerAction] = []
     
     // start the AR (or 3D scene in simulator) with the instructions and the level
     func runLevel(instructions: [PlayerAction]) {

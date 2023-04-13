@@ -11,11 +11,14 @@ class GameLevel {
     var elements : [BoardElement]
     var collisionTiles : [Int]
     var objective : BoardElement
-    var playerStart : SIMD2<Int> = .zero
+    var playerStart : SIMD2<Int>
+    var playerRotation : Float
     
-    init(elements: [BoardElement], objective: BoardElement) {
+    init(elements: [BoardElement], objective: BoardElement, playerStart: SIMD2<Int> = .zero, playerRotation: Float = .pi ) {
         self.elements = elements
         self.objective = objective
+        self.playerStart = playerStart
+        self.playerRotation = playerRotation
         collisionTiles = []
         
         for obstacle in elements {

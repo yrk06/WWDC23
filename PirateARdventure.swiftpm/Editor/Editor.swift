@@ -143,7 +143,7 @@ struct Editor: View {
                             .resizable()
                             .frame(maxWidth: 48,maxHeight:48)
                             .aspectRatio(1, contentMode: .fit)
-                            .foregroundColor(.black)
+                            .foregroundColor(Color(red:1,green:0x58/0xFF,blue:0x58/0xFF))
                         Text("Run")
                             .font(Font.custom("Nanum Pen", size: 32))
                             .foregroundColor(Color(red:1,green:0x58/0xFF,blue:0x58/0xFF))

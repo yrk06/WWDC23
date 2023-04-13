@@ -212,7 +212,7 @@ class GameboardNode : SCNNode {
         referenceNode.runAction(SCNAction.repeatForever(SCNAction.rotateBy(x: 0, y: .pi, z: 0, duration: 5)))
         
         //Create player
-        playerController = PlayerController(at: level.playerStart)
+        playerController = PlayerController(at: level.playerStart,rotated: level.playerRotation)
         
         addChildNode(playerController!)
     }
