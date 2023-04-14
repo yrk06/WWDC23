@@ -13,6 +13,8 @@ class TutorialOverlay : SKScene {
     var currentScene = 0
     var thisIsTheLastScreen = false
     
+    var onEnd: (()->Void) = {}
+    
     static func createTutorialOverlay() -> TutorialOverlay {
         let scene = TutorialOverlay(fileNamed: "TutorialOverlay")!
         scene.scaleMode = .fill
@@ -20,8 +22,8 @@ class TutorialOverlay : SKScene {
         return scene
     }
     
-    private func initializeState() {
-        self.view?.backgroundColor = .black
+    private func initializeState(bgColor : UIColor = .black ) {
+        self.view?.backgroundColor = bgColor
         self.view?.isUserInteractionEnabled = true
         let node = childNode(withName: "//\(currentState)")!
         node.run(SKAction.fadeIn(withDuration: 0.2))
@@ -34,12 +36,13 @@ class TutorialOverlay : SKScene {
         currentState = "EntryScene"
         currentScene = 0
         initializeState()
+        onEnd = runQuickTutorial
     }
     
     func runQuickTutorial() {
-        currentState = "QuickTutorial"
+        currentState = "FirstLevelTutorial"
         currentScene = 0
-        initializeState()
+        initializeState(bgColor: .clear)
     }
     
     func runPostFirstLevel() {
@@ -87,6 +90,9 @@ class TutorialOverlay : SKScene {
             node.run(SKAction.fadeOut(withDuration: 0.2))
             self.view?.backgroundColor = .clear
             self.view?.isUserInteractionEnabled = false
+            
+            onEnd()
+            onEnd = {}
         }
     }
 }

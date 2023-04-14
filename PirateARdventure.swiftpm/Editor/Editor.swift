@@ -39,68 +39,70 @@ struct Editor: View {
                 
                 Divider()
                 VStack {
-                    HStack {
-                        Text("Editor")
-                            .foregroundColor(.black)
-                            .font(Font.custom("Nanum Pen", size: 48))
-                            .padding(.bottom,16)
-                        
-                    }.frame(
-                        maxWidth: .infinity
-                    )
-                    .background(Color(red:1,green:0x58/0xFF,blue:0x58/0xFF))
-                    
-                    HStack {
-                        Button(action: {
-                            instructions.append(PlayerAction(distance: 0, rotate: -1))
-                        },label: {
-                            Text("Add Turn Left")
-                                .font(Font.custom("Nanum Pen", size: 32))
-                                .foregroundColor(.black)
-                                .frame(maxWidth: .infinity)
-                                .background(Image("GemButton")
-                                    .resizable()
-                                    .aspectRatio(contentMode: .fill))
-                                .aspectRatio(contentMode: .fit)
-                                
-                                
+                    VStack(spacing: 0) {
+                        HStack {
+                            Text("Editor")
+                                .foregroundColor(.white)
+                                .font(Font.custom("Nanum Pen", size: 48))
                             
-                        })
-                        Button(action: {
-                            instructions.append(PlayerAction(distance: 1, rotate: 0))
-                        },label: {
-                            Text("Add Forward")
-                                .font(Font.custom("Nanum Pen", size: 32))
-                                .foregroundColor(.black)
-                                .frame(maxWidth: .infinity)
-                                .background(Image("GemButton")
-                                    .resizable()
-                                    .aspectRatio(contentMode: .fill))
-                                .aspectRatio(contentMode: .fit)
-                                
-                                
-                            
-                        })
-                        Button(action: {
-                            instructions.append(PlayerAction(distance: 0, rotate: 1))
-                        },label: {
-                            Text("Add Turn Right")
-                                .font(Font.custom("Nanum Pen", size: 32))
-                                .foregroundColor(.black)
-                                .frame(maxWidth: .infinity)
-                                .background(Image("GemButton")
-                                    .resizable()
-                                    .aspectRatio(contentMode: .fill))
-                                .aspectRatio(contentMode: .fit)
-                                
-                                
-                            
-                        })
+                        }.frame(
+                            maxWidth: .infinity
+                        )
                         
                         
+                        HStack {
+                            Button(action: {
+                                instructions.append(PlayerAction(distance: 0, rotate: -1))
+                            },label: {
+                                Text("Turn Left")
+                                    .font(Font.custom("Nanum Pen", size: 32))
+                                    .foregroundColor(.black)
+                                    .frame(maxWidth: .infinity)
+                                    .background(Image("EmeraldButton")
+                                        .resizable()
+                                        .aspectRatio(contentMode: .fill))
+                                    .aspectRatio(contentMode: .fit)
+                                
+                                
+                                
+                            })
+                            Button(action: {
+                                instructions.append(PlayerAction(distance: 1, rotate: 0))
+                            },label: {
+                                Text("Forward")
+                                    .font(Font.custom("Nanum Pen", size: 32))
+                                    .foregroundColor(.black)
+                                    .frame(maxWidth: .infinity)
+                                    .background(Image("GemButton")
+                                        .resizable()
+                                        .aspectRatio(contentMode: .fill))
+                                    .aspectRatio(contentMode: .fit)
+                                
+                                
+                                
+                            })
+                            Button(action: {
+                                instructions.append(PlayerAction(distance: 0, rotate: 1))
+                            },label: {
+                                Text("Turn Right")
+                                    .font(Font.custom("Nanum Pen", size: 32))
+                                    .foregroundColor(.black)
+                                    .frame(maxWidth: .infinity)
+                                    .background(Image("SaphireButton")
+                                        .resizable()
+                                        .aspectRatio(contentMode: .fill))
+                                    .aspectRatio(contentMode: .fit)
+                                
+                                
+                                
+                            })
+                            
+                            
+                        }
+                        .padding()
                     }
                     .padding()
-                    .padding(.top,16)
+                    .background(Color(red: 61/255, green: 49/255, blue: 49/255))
                     
                     ScrollView() {
                         ForEach(Array(instructions.enumerated()), id: \.offset) { index, action in
@@ -161,7 +163,7 @@ struct Editor: View {
                     minHeight: 0,
                     maxHeight: .infinity,
                     alignment: .top
-                ).background(Color(red: 61/255, green: 49/255, blue: 49/255))
+                ).background(Color(red: 80/255, green: 60/255, blue: 60/255))
             }
         }
         .aspectRatio(CGSize(width: 2732, height: 2048), contentMode: .fit)
@@ -219,7 +221,9 @@ struct InstructionCard: View {
                         
                     })
                     
-                    Text("\(instruction.getMagnitude())").font(Font.custom("Nanum Pen", size: 64))
+                    Text("\(instruction.getMagnitude())")
+                        .font(Font.custom("Nanum Pen", size: 64))
+                        .foregroundColor([Color.black, Color.white, Color.green][instruction.getColor()])
                     
                     Button(action: increase, label: {
                         Image(systemName:"plus.circle.fill")
@@ -249,26 +253,6 @@ struct InstructionCard: View {
                 .foregroundColor(Color(red:1,green:0x58/0xFF,blue:0x58/0xFF))
         })
     }
-    }
-    
-    func Label() -> some View {
-        for name in UIFont.familyNames {
-            print(name)
-            print(UIFont.fontNames(forFamilyName: name))
-        }
-        if instruction.rotate != 0 {
-            return Text("\(index+1). Rotate \(instruction.rotate > 0 ? "right": "left") \(abs(instruction.rotate) == 1 ? "once" : "\(abs(instruction.rotate)) times")")
-        } else {
-            return Text("\(index+1). Forward \(abs(instruction.distance) == 1 ? "once" : "\(abs(instruction.distance)) times")")
-        }
-    }
-    
-    func Count() -> Int {
-        if instruction.rotate != 0 {
-            return abs(instruction.rotate)
-        } else {
-            return abs(instruction.distance)
-        }
     }
 }
 

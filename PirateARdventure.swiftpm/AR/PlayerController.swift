@@ -26,6 +26,14 @@ struct PlayerAction: Identifiable {
         return max(distance, abs(rotate))
     }
     
+    func getColor() -> Int {
+        if rotate != 0 {
+            return rotate > 0 ? 1: 2
+        } else {
+            return 0
+        }
+    }
+    
     mutating func increaseMagnitude() {
         if rotate != 0 {
             if rotate > 0 {
