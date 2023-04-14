@@ -26,12 +26,14 @@ class ARController: UIViewController, ARSCNViewDelegate {
     var possibleBoardLocations : [BoardPossibleLocation] = []
     var hud : BoardHud!
     // These are the instructions that the boat will run
-    var instructionSet : [PlayerAction] = [PlayerAction(distance: 1, rotate: 0)]
+    var instructionSet : [PlayerAction] = [PlayerAction(distance: 2, rotate: 0)]
     
     // Levels
     // Do edit/duplicate/add new levels if you wish to create custom levels ;)
-    var currentLevel = 0
+    var currentLevel = 2
     var levels : [GameLevel] = [
+        
+        // Level 1
         GameLevel(
             elements: [
             BoardElement(boardPosition: SIMD2<Int>(0,7), boardSize: SIMD2<Int>(2,2), meshName: "tower"),
@@ -51,6 +53,28 @@ class ARController: UIViewController, ARSCNViewDelegate {
             playerRotation: 0
         ),
         
+        // Level 2
+        GameLevel(
+            elements: [
+            BoardElement(boardPosition: SIMD2<Int>(0,7), boardSize: SIMD2<Int>(2,2), meshName: "tower"),
+            BoardElement(boardPosition: SIMD2<Int>(7,7), boardSize: SIMD2<Int>(2,2), meshName: "tower"),
+            
+            BoardElement(boardPosition: SIMD2<Int>(2,6), boardSize: SIMD2<Int>(1,1), meshName: "rock"),
+            BoardElement(boardPosition: SIMD2<Int>(6,6), boardSize: SIMD2<Int>(1,1), meshName: "stone"),
+            
+            BoardElement(boardPosition: SIMD2<Int>(3,5), boardSize: SIMD2<Int>(1,1), meshName: "stone"),
+            BoardElement(boardPosition: SIMD2<Int>(5,5), boardSize: SIMD2<Int>(1,1), meshName: "rock"),
+            
+            BoardElement(boardPosition: SIMD2<Int>(3,4), boardSize: SIMD2<Int>(1,1), meshName: "stone"),
+            BoardElement(boardPosition: SIMD2<Int>(5,3), boardSize: SIMD2<Int>(2,2), meshName: "tower"),
+            BoardElement(boardPosition: SIMD2<Int>(3,1), boardSize: SIMD2<Int>(2,2), meshName: "tower"),
+        ],
+            objective: BoardElement(boardPosition: SIMD2<Int>(2,3), boardSize: SIMD2<Int>(1,1), meshName: "chest"),
+            playerStart: SIMD2<Int>(4,8),
+            playerRotation: 0
+        ),
+        
+        // Level 3
         GameLevel(elements: [
             BoardElement(boardPosition: SIMD2<Int>(6,1), boardSize: SIMD2<Int>(2,2), meshName: "tower"),
             BoardElement(boardPosition: SIMD2<Int>(4,4), boardSize: SIMD2<Int>(2,2), meshName: "tower"),
@@ -59,7 +83,10 @@ class ARController: UIViewController, ARSCNViewDelegate {
             BoardElement(boardPosition: SIMD2<Int>(1,3), boardSize: SIMD2<Int>(1,1), meshName: "rock"),
             BoardElement(boardPosition: SIMD2<Int>(1,0), boardSize: SIMD2<Int>(1,1), meshName: "stone"),
             BoardElement(boardPosition: SIMD2<Int>(3,8), boardSize: SIMD2<Int>(1,1), meshName: "stone"),
-        ],objective: BoardElement(boardPosition: SIMD2<Int>(8,1), boardSize: SIMD2<Int>(1,1), meshName: "chest"))
+            BoardElement(boardPosition: SIMD2<Int>(7,6), boardSize: SIMD2<Int>(1,1), meshName: "rock"),
+            BoardElement(boardPosition: SIMD2<Int>(6,3), boardSize: SIMD2<Int>(1,1), meshName: "stone"),
+        ],//objective: BoardElement(boardPosition: SIMD2<Int>(8,1), boardSize: SIMD2<Int>(1,1), meshName: "chest"))
+                  objective: BoardElement(boardPosition: SIMD2<Int>(0,1), boardSize: SIMD2<Int>(1,1), meshName: "chest"))
         
     ]
     
@@ -122,7 +149,7 @@ class ARController: UIViewController, ARSCNViewDelegate {
         hostingController.view.contentMode = .scaleAspectFit
         hostingController.view.backgroundColor = .black
         addChild(hostingController)
-        view.addSubview(hostingController.view)
+        view.insertSubview(hostingController.view, belowSubview: tutorialView)
         hostingController.didMove(toParent: self)
         hostingController.view.frame = view.bounds
     }
@@ -182,8 +209,9 @@ class ARController: UIViewController, ARSCNViewDelegate {
         #else
             createArView()
         #endif
-        createEditorView()
         createTutorialView()
+        createEditorView()
+        
         
         // Make sure to properly set their frames
         #if targetEnvironment(simulator)
@@ -205,7 +233,6 @@ class ARController: UIViewController, ARSCNViewDelegate {
         hostingController.willMove(toParent: nil as UIViewController?)
         hostingController.view.removeFromSuperview()
         hostingController.removeFromParent()
-        view.bringSubviewToFront(arView)
         startAR()
     }
     
@@ -216,10 +243,21 @@ class ARController: UIViewController, ARSCNViewDelegate {
     
     func nextLevel() {
         currentLevel += 1
-        if currentLevel >= levels.count {
-            //Endgame
-        }
         instructionSet = []
+        
+        if currentLevel == 1 {
+            tutorialOverlay.runPostFirstLevel()
+            instructionSet.append(PlayerAction(distance: 5, rotate: 0))
+        }
+        if currentLevel == 2 {
+            tutorialOverlay.runPostSecondLevel()
+            
+        }
+        if currentLevel >= 3 {
+            tutorialOverlay.finalScreen()
+            return
+        }
+        
         createEditorView()
     }
     

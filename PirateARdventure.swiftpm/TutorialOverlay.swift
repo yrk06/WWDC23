@@ -11,6 +11,7 @@ class TutorialOverlay : SKScene {
     
     var currentState = "EntryScene"
     var currentScene = 0
+    var thisIsTheLastScreen = false
     
     static func createTutorialOverlay() -> TutorialOverlay {
         let scene = TutorialOverlay(fileNamed: "TutorialOverlay")!
@@ -20,6 +21,7 @@ class TutorialOverlay : SKScene {
     }
     
     private func initializeState() {
+        self.view?.backgroundColor = .black
         self.view?.isUserInteractionEnabled = true
         let node = childNode(withName: "//\(currentState)")!
         node.run(SKAction.fadeIn(withDuration: 0.2))
@@ -40,19 +42,42 @@ class TutorialOverlay : SKScene {
         initializeState()
     }
     
-    func runChallenge() {
-        currentState = "EntryScene"
+    func runPostFirstLevel() {
+        currentState = "EndTutorial1Scene"
         currentScene = 0
+        initializeState()
+    }
+    
+    func runPostSecondLevel() {
+        currentState = "EndTutorial2Scene"
+        currentScene = 0
+        initializeState()
+    }
+    
+    func runChallenge() {
+        currentState = "EndTutorial1Scene"
+        currentScene = 0
+        initializeState()
+    }
+    
+    func finalScreen() {
+        currentState = "FinalGameScene"
+        currentScene = 0
+        thisIsTheLastScreen = true
         initializeState()
     }
     
     // Walk over the currentState scenes
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        
+        let sceneIn = childNode(withName:  "./\(currentState)/Scene\(currentScene + 1)" )
+        if thisIsTheLastScreen && sceneIn == nil {
+            self.isUserInteractionEnabled = false
+            return
+        }
         let sceneOut = childNode(withName: "./\(currentState)/Scene\(currentScene)")!
         sceneOut.run(SKAction.fadeOut(withDuration: 0.5))
         currentScene += 1
-        let sceneIn = childNode(withName:  "./\(currentState)/Scene\(currentScene)" )
+        
         
         sceneIn?.run(SKAction.fadeIn(withDuration: 0.5))
         

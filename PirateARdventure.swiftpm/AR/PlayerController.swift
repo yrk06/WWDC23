@@ -111,6 +111,7 @@ class PlayerController : SCNNode {
         if isLast {
             movement.timingMode = .easeOut
         }
+        
         await self.runAction(movement)
     }
     

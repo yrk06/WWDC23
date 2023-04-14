@@ -37,6 +37,7 @@ class GameboardNode : SCNNode {
                 let zcoord = -0.09 + 0.005 * Float(z)
                 
                 let circle = SCNNode(geometry: SCNSphere(radius: 0.0005))
+                circle.geometry?.firstMaterial?.diffuse.contents = Color.black
                 gridBase.addChildNode(circle)
                 circle.position.x = xcoord
                 circle.position.z = zcoord
@@ -50,6 +51,7 @@ class GameboardNode : SCNNode {
                 let zcoord = -0.09 + 0.02 * Float(z)
                 
                 let circle = SCNNode(geometry: SCNSphere(radius: 0.0005))
+                circle.geometry?.firstMaterial?.diffuse.contents = Color.black
                 gridBase.addChildNode(circle)
                 circle.position.x = xcoord
                 circle.position.z = zcoord
@@ -103,6 +105,10 @@ class GameboardNode : SCNNode {
             })    {
                 gameover = true
                 
+            
+                Task {
+                    await playerController!.updatePosition(tiles: 1,isFirst: p == 0, isLast: p == (action.distance - 1) || self.gameover || self.playerWon )
+                }
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                     let player = self.playerController!
                     player.removeAllActions()
@@ -112,27 +118,22 @@ class GameboardNode : SCNNode {
                     let fall = SCNAction.rotate(by: .pi / 2, around: playerAxis, duration: 3)
                     let rise = SCNAction.rotate(by: -.pi / 6, around: playerAxis, duration: 2)
                     
-//                    let fall = SCNAction.rotateBy(x: 0, y: 0, z: -4 * .pi / 6, duration: 3)
-//                    fall.timingMode = .easeInEaseOut
-//
-//                    let rise = SCNAction.rotateBy(x: 0, y: 0, z: .pi / 6, duration: 2)
-//                    rise.timingMode = .easeInEaseOut
-                    
                     let itSink = SCNAction.moveBy(x: 0, y: -0.008, z: 0, duration: 3)
                     
                     self.playerController?.runAction(SCNAction.sequence([SCNAction.group([
                     fall,itSink]),rise
                     ]))
-                    
-                    self.gameover = true
-                    //self.playerController?.removeFromParentNode()
                 
                 }
+                
+            } else {
+                
+                await playerController!.updatePosition(tiles: 1,isFirst: p == 0, isLast: p == (action.distance - 1) || self.gameover || self.playerWon )
+                
             }
             
             
             
-            await playerController!.updatePosition(tiles: 1,isFirst: p == 0, isLast: p == (action.distance - 1) || self.gameover || self.playerWon )
             
             if nextPos == level?.objective.boardPosition {
                 playerWon = true
@@ -144,7 +145,8 @@ class GameboardNode : SCNNode {
         
         await hud?.consumeAction()
         playerActionIndex += 1
-        gameover = gameover ? gameover : playerActionIndex == playerActionQueue.count && !playerWon
+        
+        gameover = gameover ? gameover : (playerActionIndex == playerActionQueue.count && !playerWon)
         
         
     }
