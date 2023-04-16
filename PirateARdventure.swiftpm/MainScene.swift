@@ -28,6 +28,9 @@ class ARController: UIViewController, ARSCNViewDelegate {
     // These are the instructions that the boat will run
     var instructionSet : [PlayerAction] = [PlayerAction(distance: 2, rotate: 0)]
     
+    var queuePlayer = AVQueuePlayer()
+    var playerLooper: AVPlayerLooper?
+    
     // Levels
     // Do edit/duplicate/add new levels if you wish to create custom levels ;)
     var currentLevel = 0
@@ -172,6 +175,12 @@ class ARController: UIViewController, ARSCNViewDelegate {
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         super.viewWillTransition(to: size, with: coordinator)
         
+        if size.width < size.height {
+            tutorialOverlay.showLanscapeWarning()
+        } else {
+            tutorialOverlay.hideLanscapeWarning()
+        }
+        
         scaleView(hostingController.view)
         #if targetEnvironment(simulator)
         scaleView(sceneView)
@@ -184,14 +193,11 @@ class ARController: UIViewController, ARSCNViewDelegate {
     
     // Calculate the width and height based on an Ipad Pro Aspect ratio
     func scaleView(_ v : UIView) {
-        var size = UIScreen.main.bounds.size
-        size.height -= 50
-        let aspect = 2732/2048.0
-        if size.width < size.height {
-            v.frame = CGRect(x: 0, y: Double(size.height - size.width / aspect) / 2, width: size.width, height:size.width / aspect )
-        } else {
-            v.frame = CGRect(x: Double(size.width  - size.height * aspect) / 2, y:0, width: size.height * aspect, height:size.height )
-        }
+        let width = UIScreen.main.bounds.width
+        var height = UIScreen.main.bounds.height
+        height -= view.window?.windowScene?.statusBarManager?.statusBarFrame.height ?? 24
+        v.frame = CGRect(x: 0, y: 0, width: width, height: height)
+        v.contentMode = .scaleAspectFit
     }
     
     // STARTUP
@@ -222,6 +228,13 @@ class ARController: UIViewController, ARSCNViewDelegate {
         scaleView(hostingController.view)
         scaleView(tutorialView)
         
+        let width = UIScreen.main.bounds.width
+        let height = UIScreen.main.bounds.height
+        if width < height {
+            tutorialOverlay.showLanscapeWarning()
+        } else {
+            tutorialOverlay.hideLanscapeWarning()
+        }
     }
     
     // GameLogic
@@ -234,6 +247,12 @@ class ARController: UIViewController, ARSCNViewDelegate {
         hostingController.view.removeFromSuperview()
         hostingController.removeFromParent()
         startAR()
+        
+        let url = Bundle.main.url(forResource: "Ocean3", withExtension: "wav")!
+        let playerItem = AVPlayerItem(asset: AVAsset(url: url))
+        playerLooper = AVPlayerLooper(player: queuePlayer, templateItem: playerItem)
+        queuePlayer.play()
+        queuePlayer.volume = 0.8
     }
     
     // Game callback if the player gets the objective or not
@@ -330,7 +349,7 @@ class ARController: UIViewController, ARSCNViewDelegate {
     func startAR() {
         board?.removeFromParentNode()
         
-        hud = BoardHud.createHUD(reset: self.startAR, onStart: {
+        hud = BoardHud.createHUD(levelNumber: currentLevel, reset: self.startAR, onStart: {
             self.board?.runGame()
         },onWin: nextLevel, onLose: tryAgain)
         board = GameboardNode.newGameboard(hud: hud, level: levels[currentLevel], instructions: instructionSet)
@@ -347,7 +366,7 @@ class ARController: UIViewController, ARSCNViewDelegate {
         arView.session.pause()
         
         // Add a new hud
-        hud = BoardHud.createHUD(reset: self.startAR, onStart: {
+        hud = BoardHud.createHUD(levelNumber: currentLevel, reset: self.startAR, onStart: {
             self.board?.runGame()
         },onWin: nextLevel, onLose: tryAgain)
         arView.overlaySKScene = hud

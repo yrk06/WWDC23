@@ -13,12 +13,15 @@ class TutorialOverlay : SKScene {
     var currentScene = 0
     var thisIsTheLastScreen = false
     
+    var landscapeWarning : SKLabelNode!
+    
     var onEnd: (()->Void) = {}
     
     static func createTutorialOverlay() -> TutorialOverlay {
         let scene = TutorialOverlay(fileNamed: "TutorialOverlay")!
-        scene.scaleMode = .fill
+        scene.scaleMode = .aspectFit
         scene.backgroundColor = .clear
+        scene.landscapeWarning = scene.childNode(withName: "//Warning") as? SKLabelNode
         return scene
     }
     
@@ -68,6 +71,14 @@ class TutorialOverlay : SKScene {
         currentScene = 0
         thisIsTheLastScreen = true
         initializeState()
+    }
+    
+    func showLanscapeWarning() {
+        landscapeWarning.run(SKAction.fadeAlpha(to: 1, duration: 0.1))
+    }
+    
+    func hideLanscapeWarning() {
+        landscapeWarning.run(SKAction.fadeAlpha(to: 0, duration: 0.1))
     }
     
     // Walk over the currentState scenes

@@ -18,13 +18,17 @@ class BoardHud: SKScene {
     var onWin : (()->Void)! = {}
     var onLose : (()->Void)! = {}
     
-    static func createHUD(reset: (()->Void)!, onStart: (()->Void)!, onWin: (()->Void)!, onLose: (()->Void)! ) -> BoardHud {
+    var level = 0
+    
+    static func createHUD(levelNumber: Int,reset: (()->Void)!, onStart: (()->Void)!, onWin: (()->Void)!, onLose: (()->Void)! ) -> BoardHud {
         // Doesnt work in an actual playground, god why???
         // let hud = SKScene(fileNamed: "HUD") as! BoardHud
         let hud = BoardHud(fileNamed: "HUD")!
         hud.onStartButtonPressed = onStart
         hud.onWin = onWin
         hud.onLose = onLose
+        
+        hud.level = levelNumber
         
         hud.scaleMode = .aspectFit
         hud.isUserInteractionEnabled = false
@@ -36,7 +40,8 @@ class BoardHud: SKScene {
         backdrop.addChild(blur)
         blur.filter = CIFilter(name: "CIGaussianBlur", parameters: ["inputRadius": 75])
         //hud.addChild(actualHud)
-        
+        let levelLabel = hud.childNode(withName: "//LevelNumber") as? SKLabelNode
+        levelLabel?.text = "Level \(levelNumber + 1)"
         
         return hud
     }
