@@ -31,6 +31,9 @@ class ARController: UIViewController, ARSCNViewDelegate {
     var queuePlayer = AVQueuePlayer()
     var playerLooper: AVPlayerLooper?
     
+    var queuePlayerBg = AVQueuePlayer()
+    var playerLooperBg: AVPlayerLooper?
+    
     // Levels
     // Do edit/duplicate/add new levels if you wish to create custom levels ;)
     var currentLevel = 0
@@ -204,6 +207,18 @@ class ARController: UIViewController, ARSCNViewDelegate {
     
     override func viewDidLoad() {
         view.backgroundColor = .black
+        
+        let oceanurl = Bundle.main.url(forResource: "Ocean3", withExtension: "wav")!
+        let oceanItem = AVPlayerItem(asset: AVAsset(url: oceanurl))
+        playerLooper = AVPlayerLooper(player: queuePlayer, templateItem: oceanItem)
+        queuePlayer.play()
+        queuePlayer.volume = 2
+        
+        let bgurl = Bundle.main.url(forResource: "Music", withExtension: "wav")!
+        let bgItem = AVPlayerItem(asset: AVAsset(url: bgurl))
+        playerLooperBg = AVPlayerLooper(player: queuePlayerBg, templateItem: bgItem)
+        queuePlayerBg.play()
+        queuePlayerBg.volume = 0.2
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -248,11 +263,7 @@ class ARController: UIViewController, ARSCNViewDelegate {
         hostingController.removeFromParent()
         startAR()
         
-        let url = Bundle.main.url(forResource: "Ocean3", withExtension: "wav")!
-        let playerItem = AVPlayerItem(asset: AVAsset(url: url))
-        playerLooper = AVPlayerLooper(player: queuePlayer, templateItem: playerItem)
-        queuePlayer.play()
-        queuePlayer.volume = 0.8
+        
     }
     
     // Game callback if the player gets the objective or not
