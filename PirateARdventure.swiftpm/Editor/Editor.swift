@@ -41,7 +41,7 @@ struct Editor: View {
                 VStack {
                     VStack(spacing: 0) {
                         HStack {
-                            Text("Editor")
+                            Text("Treasure Map")
                                 .foregroundColor(.white)
                                 .font(Font.custom("Nanum Pen", size: 48))
                             
@@ -54,48 +54,84 @@ struct Editor: View {
                             Button(action: {
                                 instructions.append(PlayerAction(distance: 0, rotate: -1))
                             },label: {
-                                Text("Turn Left")
-                                    .font(Font.custom("Nanum Pen", size: 32))
-                                    .foregroundColor(.black)
-                                    .frame(maxWidth: .infinity)
-                                    .background(Image("EmeraldButton")
+                                VStack {
+                                    Image(systemName: "arrow.turn.up.left")
                                         .resizable()
-                                        .aspectRatio(contentMode: .fill))
-                                    .aspectRatio(contentMode: .fit)
+                                        .foregroundColor(.black)
+                                        .frame(maxWidth: 24,maxHeight:24)
+                                        .padding()
+                                        .background(Image("EmeraldButton")
+                                            .resizable()
+                                            .aspectRatio(contentMode: .fill))
+                                        .aspectRatio(contentMode: .fit)
+                                }.frame(maxWidth: .infinity)
+                                
+//                                Text("Turn Left")
+//                                    .font(Font.custom("Nanum Pen", size: 32))
+//                                    .foregroundColor(.black)
+//                                    .frame(maxWidth: .infinity)
+//                                    .background(Image("EmeraldButton")
+//                                        .resizable()
+//                                        .aspectRatio(contentMode: .fill))
+//                                    .aspectRatio(contentMode: .fit)
                                 
                                 
                                 
-                            })
+                            }).padding(.trailing,16)
                             Button(action: {
                                 instructions.append(PlayerAction(distance: 1, rotate: 0))
                             },label: {
-                                Text("Forward")
-                                    .font(Font.custom("Nanum Pen", size: 32))
-                                    .foregroundColor(.black)
-                                    .frame(maxWidth: .infinity)
-                                    .background(Image("GemButton")
+//                                Text("Forward")
+//                                    .font(Font.custom("Nanum Pen", size: 32))
+//                                    .foregroundColor(.black)
+//                                    .frame(maxWidth: .infinity)
+//                                    .background(Image("GemButton")
+//                                        .resizable()
+//                                        .aspectRatio(contentMode: .fill))
+//                                    .aspectRatio(contentMode: .fit)
+                                VStack {
+                                    Image(systemName: "arrow.up")
                                         .resizable()
-                                        .aspectRatio(contentMode: .fill))
-                                    .aspectRatio(contentMode: .fit)
+                                        .foregroundColor(.black)
+                                        .frame(maxWidth: 24,maxHeight:24)
+                                        .padding()
+                                        .background(Image("GemButton")
+                                            .resizable()
+                                            .aspectRatio(contentMode: .fill))
+                                        .aspectRatio(contentMode: .fit)
+                                }.frame(maxWidth: .infinity)
                                 
                                 
                                 
                             })
+                            .padding(.leading,16)
+                            .padding(.trailing,16)
                             Button(action: {
                                 instructions.append(PlayerAction(distance: 0, rotate: 1))
                             },label: {
-                                Text("Turn Right")
-                                    .font(Font.custom("Nanum Pen", size: 32))
-                                    .foregroundColor(.black)
-                                    .frame(maxWidth: .infinity)
-                                    .background(Image("SaphireButton")
+                                VStack {
+                                    Image(systemName: "arrow.turn.up.right")
                                         .resizable()
-                                        .aspectRatio(contentMode: .fill))
-                                    .aspectRatio(contentMode: .fit)
+                                        .foregroundColor(.black)
+                                        .frame(maxWidth: 24,maxHeight:24)
+                                        .padding()
+                                        .background(Image("SaphireButton")
+                                            .resizable()
+                                            .aspectRatio(contentMode: .fill))
+                                        .aspectRatio(contentMode: .fit)
+                                }.frame(maxWidth: .infinity)
+//                                Text("Turn Right")
+//                                    .font(Font.custom("Nanum Pen", size: 32))
+//                                    .foregroundColor(.black)
+//                                    .frame(maxWidth: .infinity)
+//                                    .background(Image("SaphireButton")
+//                                        .resizable()
+//                                        .aspectRatio(contentMode: .fill))
+//                                    .aspectRatio(contentMode: .fit)
                                 
                                 
                                 
-                            })
+                            }).padding(.leading,16)
                             
                             
                         }
@@ -149,10 +185,10 @@ struct Editor: View {
                         Text("Run")
                             .font(Font.custom("Nanum Pen", size: 32))
                             .foregroundColor(Color(red:1,green:0x58/0xFF,blue:0x58/0xFF))
-                            .padding()
+                            
                         
                         
-                    })
+                    }).padding()
                         
                     }
                     
@@ -223,7 +259,7 @@ struct InstructionCard: View {
                     
                     Text("\(instruction.getMagnitude())")
                         .font(Font.custom("Nanum Pen", size: 64))
-                        .foregroundColor([Color.black, Color.white, Color.green][instruction.getColor()])
+                        .foregroundColor(.black)
                     
                     Button(action: increase, label: {
                         Image(systemName:"plus.circle.fill")
@@ -242,7 +278,7 @@ struct InstructionCard: View {
         .frame(maxWidth: 400,maxHeight: 200)
         .aspectRatio(CGSize(width: 2, height: 1), contentMode: .fill)
         .background(
-            Image("sign")
+            Image(["sign-gem", "sign-saphire","sign-emerald"][instruction.getColor()])
                 .resizable()
         )
         Button(action: removeInstruction, label: {

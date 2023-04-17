@@ -348,6 +348,7 @@ class ARController: UIViewController, ARSCNViewDelegate {
         node.addChildNode(board!)
         hud.isUserInteractionEnabled = true
         hud.showSideBar()
+        hud.hideSurfaceWarningBar()
     }
     
     
@@ -368,6 +369,7 @@ class ARController: UIViewController, ARSCNViewDelegate {
         sceneView.overlaySKScene = hud
         hud.isUserInteractionEnabled = true
         hud.showSideBar()
+        hud.hideSurfaceWarningBar()
     }
 #else
     func startAR() {

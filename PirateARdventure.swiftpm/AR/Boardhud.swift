@@ -55,8 +55,8 @@ class BoardHud: SKScene {
         let anchor = self.childNode(withName: "//NextMovement")
         
         for (index, action) in list.enumerated() {
-            let board = SKSpriteNode(imageNamed: "sign")
-            board.size = CGSize(width: 512, height: 196)
+            let board = SKSpriteNode(imageNamed: ["sign-gem", "sign-saphire","sign-emerald"][action.getColor()])
+            board.size = CGSize(width: 512, height: 256)
             
             
             let label = SKLabelNode()
@@ -79,7 +79,7 @@ class BoardHud: SKScene {
             let realIndex = index > 4 ? 5 : index
             board.position.y = CGFloat(-(196/2) - (204 * realIndex))
             
-            board.setScale(0.75)
+            board.setScale(0.75 * 0.75)
             anchor?.addChild(board)
             listOfActions.append(board)
         }
@@ -112,6 +112,13 @@ class BoardHud: SKScene {
             await gameover.run(gameOverEntry)
         }
         
+    }
+    
+    func hideSurfaceWarningBar() {
+        let surfaceWarning = childNode(withName: "SurfaceWarning")!
+        let moveIn = SKAction.moveTo(y: -1024, duration: 1)
+        
+        surfaceWarning.run(moveIn)
     }
     
     func showSideBar() {
