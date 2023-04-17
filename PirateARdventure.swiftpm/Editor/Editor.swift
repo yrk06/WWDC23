@@ -55,25 +55,24 @@ struct Editor: View {
                                 instructions.append(PlayerAction(distance: 0, rotate: -1))
                             },label: {
                                 VStack {
-                                    Image(systemName: "arrow.turn.up.left")
-                                        .resizable()
-                                        .foregroundColor(.black)
-                                        .frame(maxWidth: 24,maxHeight:24)
-                                        .padding()
+                                    HStack {
+                                        Image(systemName: "arrow.turn.up.left")
+                                            .resizable()
+                                            .foregroundColor(.black)
+                                            .frame(maxWidth: 24,maxHeight:24)
+                                    }.padding()
                                         .background(Image("EmeraldButton")
                                             .resizable()
                                             .aspectRatio(contentMode: .fill))
                                         .aspectRatio(contentMode: .fit)
+                                        .foregroundColor(.black)
+                                    
+                                    Text("Turn left")
+                                    .font(Font.custom("Nanum Pen", size: 24))
+                                    .foregroundColor(.white)
+                                    .padding(0)
+                                    
                                 }.frame(maxWidth: .infinity)
-                                
-//                                Text("Turn Left")
-//                                    .font(Font.custom("Nanum Pen", size: 32))
-//                                    .foregroundColor(.black)
-//                                    .frame(maxWidth: .infinity)
-//                                    .background(Image("EmeraldButton")
-//                                        .resizable()
-//                                        .aspectRatio(contentMode: .fill))
-//                                    .aspectRatio(contentMode: .fit)
                                 
                                 
                                 
@@ -81,27 +80,25 @@ struct Editor: View {
                             Button(action: {
                                 instructions.append(PlayerAction(distance: 1, rotate: 0))
                             },label: {
-//                                Text("Forward")
-//                                    .font(Font.custom("Nanum Pen", size: 32))
-//                                    .foregroundColor(.black)
-//                                    .frame(maxWidth: .infinity)
-//                                    .background(Image("GemButton")
-//                                        .resizable()
-//                                        .aspectRatio(contentMode: .fill))
-//                                    .aspectRatio(contentMode: .fit)
-                                VStack {
+                               VStack {
+                                HStack {
                                     Image(systemName: "arrow.up")
                                         .resizable()
                                         .foregroundColor(.black)
                                         .frame(maxWidth: 24,maxHeight:24)
-                                        .padding()
-                                        .background(Image("GemButton")
-                                            .resizable()
-                                            .aspectRatio(contentMode: .fill))
-                                        .aspectRatio(contentMode: .fit)
-                                }.frame(maxWidth: .infinity)
-                                
-                                
+                                        
+                                }.padding()
+                                    .background(Image("GemButton")
+                                        .resizable()
+                                        .aspectRatio(contentMode: .fill))
+                                    .aspectRatio(contentMode: .fit)
+                                   
+                                   Text("Go Forward")
+                                   .font(Font.custom("Nanum Pen", size: 24))
+                                   .foregroundColor(.white)
+                                   .padding(0)
+                                   
+                            }.frame(maxWidth: .infinity)
                                 
                             })
                             .padding(.leading,16)
@@ -110,32 +107,29 @@ struct Editor: View {
                                 instructions.append(PlayerAction(distance: 0, rotate: 1))
                             },label: {
                                 VStack {
-                                    Image(systemName: "arrow.turn.up.right")
-                                        .resizable()
-                                        .foregroundColor(.black)
-                                        .frame(maxWidth: 24,maxHeight:24)
-                                        .padding()
-                                        .background(Image("SaphireButton")
-                                            .resizable()
-                                            .aspectRatio(contentMode: .fill))
-                                        .aspectRatio(contentMode: .fit)
-                                }.frame(maxWidth: .infinity)
-//                                Text("Turn Right")
-//                                    .font(Font.custom("Nanum Pen", size: 32))
-//                                    .foregroundColor(.black)
-//                                    .frame(maxWidth: .infinity)
-//                                    .background(Image("SaphireButton")
-//                                        .resizable()
-//                                        .aspectRatio(contentMode: .fill))
-//                                    .aspectRatio(contentMode: .fit)
-                                
-                                
+                                 HStack {
+                                     Image(systemName: "arrow.turn.up.right")
+                                         .resizable()
+                                         .foregroundColor(.black)
+                                         .frame(maxWidth: 24,maxHeight:24)
+                                         
+                                 }.padding()
+                                     .background(Image("SaphireButton")
+                                         .resizable()
+                                         .aspectRatio(contentMode: .fill))
+                                     .aspectRatio(contentMode: .fit)
+                                    
+                                    Text("Turn right")
+                                    .font(Font.custom("Nanum Pen", size: 24))
+                                    .foregroundColor(.white)
+                                    .padding(0)
+                                    
+                             }.frame(maxWidth: .infinity)
                                 
                             }).padding(.leading,16)
                             
                             
                         }
-                        .padding()
                     }
                     .padding()
                     .background(Color(red: 61/255, green: 49/255, blue: 49/255))

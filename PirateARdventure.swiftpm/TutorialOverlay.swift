@@ -85,7 +85,31 @@ class TutorialOverlay : SKScene {
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         let sceneIn = childNode(withName:  "./\(currentState)/Scene\(currentScene + 1)" )
         if thisIsTheLastScreen && sceneIn == nil {
-            self.isUserInteractionEnabled = false
+            
+            let first = touches.first!
+            let location = first.location(in: self)
+
+            let playAgain = childNode(withName: "//PlayAgain")
+            let selfLocation = (playAgain?.parent?.convert(location, from: self))!
+
+            if playAgain?.contains(selfLocation) == true {
+
+                // Clean current scene
+                let sceneOut = childNode(withName: "./\(currentState)/Scene\(currentScene)")!
+                sceneOut.run(SKAction.fadeOut(withDuration: 0.5))
+
+                // Clear
+                thisIsTheLastScreen = false
+                self.isUserInteractionEnabled = false
+
+                let node = childNode(withName: "//\(currentState)")!
+                node.run(SKAction.fadeOut(withDuration: 0.2))
+                self.view?.backgroundColor = .clear
+                self.view?.isUserInteractionEnabled = false
+
+                onEnd()
+                onEnd = {}
+            }
             return
         }
         let sceneOut = childNode(withName: "./\(currentState)/Scene\(currentScene)")!
@@ -105,5 +129,7 @@ class TutorialOverlay : SKScene {
             onEnd()
             onEnd = {}
         }
+        
+        
     }
 }

@@ -36,7 +36,7 @@ class ARController: UIViewController, ARSCNViewDelegate {
     
     // Levels
     // Do edit/duplicate/add new levels if you wish to create custom levels ;)
-    var currentLevel = 0
+    var currentLevel = 2
     var levels : [GameLevel] = [
         
         // Level 1
@@ -91,8 +91,8 @@ class ARController: UIViewController, ARSCNViewDelegate {
             BoardElement(boardPosition: SIMD2<Int>(3,8), boardSize: SIMD2<Int>(1,1), meshName: "stone"),
             BoardElement(boardPosition: SIMD2<Int>(7,6), boardSize: SIMD2<Int>(1,1), meshName: "rock"),
             BoardElement(boardPosition: SIMD2<Int>(6,3), boardSize: SIMD2<Int>(1,1), meshName: "stone"),
-        ],objective: BoardElement(boardPosition: SIMD2<Int>(8,1), boardSize: SIMD2<Int>(1,1), meshName: "chest"))
-//                  objective: BoardElement(boardPosition: SIMD2<Int>(0,1), boardSize: SIMD2<Int>(1,1), meshName: "chest"))
+        ],//objective: BoardElement(boardPosition: SIMD2<Int>(8,1), boardSize: SIMD2<Int>(1,1), meshName: "chest"))
+                  objective: BoardElement(boardPosition: SIMD2<Int>(0,1), boardSize: SIMD2<Int>(1,1), meshName: "chest"))
         
     ]
     
@@ -288,7 +288,7 @@ class ARController: UIViewController, ARSCNViewDelegate {
         }
         if currentLevel >= 3 {
             tutorialOverlay.finalScreen()
-            return
+            currentLevel = 0
         }
         
         createEditorView()
