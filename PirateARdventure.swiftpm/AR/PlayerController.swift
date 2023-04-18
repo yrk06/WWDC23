@@ -92,8 +92,20 @@ class PlayerController : SCNNode {
         fatalError("init(coder:) has not been implemented")
     }
     
+    var particlesInit = false
+    func initParticleTrail() {
+        if particlesInit {
+            return
+        }
+        particlesInit = true
+        let particle = childNode(withName: "particles", recursively: true)!.particleSystems?.first
+        particle?.birthRate = 15
+        
+    }
+    
     // Rotate the ship
     func updateRotation(rotation: Int) async {
+        initParticleTrail()
         let angle = -.pi / 2 * Float(rotation)
         let rotationAction = SCNAction.rotateBy(x: 0, y: CGFloat(angle), z: 0, duration: Double(abs(rotation)) * 3.0)
         rotationAction.timingMode = .easeInEaseOut
@@ -102,7 +114,7 @@ class PlayerController : SCNNode {
     
     // Move ship forward
     func updatePosition(tiles: Int, isFirst : Bool = false, isLast : Bool = false) async {
-        
+        initParticleTrail()
         let to = getForwardPosition(tiles: tiles)
         
         self.boardPosition = to

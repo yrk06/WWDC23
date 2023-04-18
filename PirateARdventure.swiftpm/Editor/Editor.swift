@@ -18,6 +18,8 @@ struct Editor: View {
     
     var level : GameLevel = GameLevel(elements: [], objective: BoardElement(boardPosition: SIMD2<Int>(4,4), boardSize: .one, meshName: "chest"))
     
+    var isTutorial : Bool = false
+    
     @State var instructions : [PlayerAction] = [
     ]
     
@@ -28,7 +30,7 @@ struct Editor: View {
             HStack(alignment: .center) {
                 
                 VStack {
-                    BoardPreviewView(level: level)
+                    BoardPreviewView(level: level, showTutorial: isTutorial)
                 }.frame(
                     minWidth: 0,
                     maxWidth: .infinity,

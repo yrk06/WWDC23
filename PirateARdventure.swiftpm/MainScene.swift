@@ -36,7 +36,7 @@ class ARController: UIViewController, ARSCNViewDelegate {
     
     // Levels
     // Do edit/duplicate/add new levels if you wish to create custom levels ;)
-    var currentLevel = 2
+    var currentLevel = 0
     var levels : [GameLevel] = [
         
         // Level 1
@@ -142,7 +142,7 @@ class ARController: UIViewController, ARSCNViewDelegate {
     func createEditorView() {
         pauseAR() // Save a few resources... I hope
         
-        editorView = Editor(run: runLevel, level: levels[currentLevel], instructions: instructionSet)
+        editorView = Editor(run: runLevel, level: levels[currentLevel], isTutorial: (currentLevel == 0), instructions: instructionSet )
         
         /* Editor View is a swiftUI View so I need to wrap it
          * Yes, it's a swiftUI being wrapped into a UIView in a
