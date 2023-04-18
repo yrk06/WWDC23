@@ -160,9 +160,11 @@ class GameboardNode : SCNNode {
         while true {
             if gameover{
                 self.hud?.setActionFailure()
+                playerController?.stopParticleTrail()
                 break
             }
             if playerWon {
+                playerController?.stopParticleTrail()
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                     self.hud?.hideSideBar()
                     self.hud?.showWinPrompt()

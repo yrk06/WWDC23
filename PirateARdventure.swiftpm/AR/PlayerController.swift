@@ -98,9 +98,15 @@ class PlayerController : SCNNode {
             return
         }
         particlesInit = true
-        let particle = childNode(withName: "particles", recursively: true)!.particleSystems?.first
-        particle?.birthRate = 15
+        let particle = childNode(withName: "foam", recursively: true)!.particleSystems?.first
+        particle?.birthRate = 100
         
+    }
+    
+    func stopParticleTrail() {
+        particlesInit = false
+        let particle = childNode(withName: "foam", recursively: true)!.particleSystems?.first
+        particle?.birthRate = 0
     }
     
     // Rotate the ship
