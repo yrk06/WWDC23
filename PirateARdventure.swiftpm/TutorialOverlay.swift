@@ -28,6 +28,7 @@ class TutorialOverlay : SKScene {
     private func initializeState(bgColor : UIColor = .black ) {
         self.view?.backgroundColor = bgColor
         self.view?.isUserInteractionEnabled = true
+        
         let node = childNode(withName: "//\(currentState)")!
         node.run(SKAction.fadeIn(withDuration: 0.2))
         let sceneIn = childNode(withName:  "./\(currentState)/Scene\(currentScene)" )!
@@ -100,7 +101,6 @@ class TutorialOverlay : SKScene {
 
                 // Clear
                 thisIsTheLastScreen = false
-                self.isUserInteractionEnabled = false
 
                 let node = childNode(withName: "//\(currentState)")!
                 node.run(SKAction.fadeOut(withDuration: 0.2))
