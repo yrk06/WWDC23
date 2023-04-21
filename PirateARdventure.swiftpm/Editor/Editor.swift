@@ -30,7 +30,7 @@ struct Editor: View {
             HStack(alignment: .center) {
                 
                 VStack {
-                    BoardPreviewView(level: level, showTutorial: isTutorial)
+                    BoardPreviewView(level: level, showTutorial: isTutorial )
                 }.frame(
                     minWidth: 0,
                     maxWidth: .infinity,
